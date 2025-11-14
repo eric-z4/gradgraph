@@ -1,3 +1,5 @@
+'use client';
+
 import * as d3 from "d3";
 import { init, getInstanceByDom } from "echarts";
 import { useEffect, useRef } from "react";
