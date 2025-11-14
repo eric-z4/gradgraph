@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import * as d3 from "d3";
 import { init, getInstanceByDom } from "echarts";
@@ -235,10 +235,5 @@ export default function Sankey({ data, width = 640, height = 400 }) {
         chart.setOption(option);
     }, [data]);
 
-    return (
-        <div
-            ref={chartRef}
-            style={`width:${width}px;height:${height}px;`}
-        ></div>
-    );
+    return <div ref={chartRef} style={{ width: width, height: height }}></div>;
 }
