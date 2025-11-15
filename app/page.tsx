@@ -5,7 +5,21 @@ import ChartGroup from "./components/chart_group";
 
 export default async function Page() {
     const csvFile = await fs.readFile(process.cwd() + "/app/data/UH_Student_Degrees_Awarded.csv", "utf8");
-    const rawDegreeData = d3.csvParse(csvFile);
+    const rawDegreeData = Array.from(d3.csvParse(csvFile, (d) => {
+        return {
+            FISCAL_YEAR: d.FISCAL_YEAR,
+            CAMPUS: d.CAMPUS,
+            CIP: d.CIP,
+            CIP_DESC: d.CIP_DESC,
+            GROUP1: d.GROUP1,
+            GROUP2: d.GROUP2,
+            GROUP3: d.GROUP3,
+            GROUP4: d.GROUP4,
+            GROUP5: d.GROUP5,
+            OUTCOME: d.OUTCOME,
+            AWARDS: +d.AWARDS
+        };
+    }));
     
     return (
         <div>

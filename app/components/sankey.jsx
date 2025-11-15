@@ -132,8 +132,7 @@ export default function Sankey({
     data,
     width = 1200,
     height = 800
-})
-{
+}) {
     const chartRef = useRef(null);
 
     useEffect(() => {

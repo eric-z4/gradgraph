@@ -3,10 +3,26 @@
 import { useState } from "react";
 import Sankey from "./sankey";
 
+interface DataRows
+{
+    FISCAL_YEAR: string,
+    CAMPUS: string,
+    CIP: string,
+    CIP_DESC: string,
+    GROUP1: string,
+    GROUP2: string,
+    GROUP3: string,
+    GROUP4: string,
+    GROUP5: string,
+    OUTCOME: string,
+    AWARDS: number;
+}
+
 export default function ChartGroup({
     rawDegreeData,
-})
-{
+}: Readonly<{
+    rawDegreeData: Array<DataRows>;
+}>) {
     const enum Campus {
         Manoa = "UH Manoa",
         Hilo = "UH Hilo",
@@ -34,7 +50,7 @@ export default function ChartGroup({
 
     const [campus, setCampus] = useState(Campus.Manoa);
     const [year, setYear] = useState(Year.Y2025);
-    const filteredData = rawDegreeData.filter(x => x.CAMPUS == campus && x.FISCAL_YEAR == year);
+    const filteredData = rawDegreeData.filter(item => item.CAMPUS == campus && item.FISCAL_YEAR == year);
 
     return (
         <div>
