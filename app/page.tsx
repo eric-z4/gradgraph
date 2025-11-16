@@ -1,6 +1,5 @@
 import * as d3 from "d3";
 import { promises as fs } from "fs";
-import LinePlot from "./components/test_chart";
 import ChartGroup from "./components/chart_group";
 
 export default async function Page() {
@@ -22,9 +21,8 @@ export default async function Page() {
     }));
     
     return (
-        <div>
-            <h1>Hello World</h1>
-            <LinePlot data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]} />
+        <div className="flex h-screen">
+            <div className="bg-blue-50 flex-none w-1/3 h-full"></div>
             <ChartGroup rawDegreeData={rawDegreeData} />
         </div>
     );

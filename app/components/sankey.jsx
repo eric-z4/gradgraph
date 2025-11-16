@@ -130,8 +130,7 @@ https://www.taniarascia.com/apache-echarts-react/
 */
 export default function Sankey({
     data,
-    width = 1200,
-    height = 800
+    className = "",
 }) {
     const chartRef = useRef(null);
 
@@ -148,18 +147,26 @@ export default function Sankey({
         const sankeyData = sankeyDataProcess(data);
 
         let option = {
+            backgroundColor: "rgba(0, 18, 3, 1)",
             tooltip: {
                 trigger: "item",
                 triggerOn: "mousemove",
             },
             series: {
                 type: "sankey",
+                width: "80%",
+                height: "90%",
                 data: sankeyData.nodes,
                 links: sankeyData.links,
                 nodeAlign: "left",
                 nodeWidth: 16,
-                nodeGap: 7,
+                nodeGap: 3,
                 layoutIterations: 0,
+                draggable: false,
+                roam: true,
+                label: {
+                    fontSize: 8
+                },
                 itemStyle: {
                     borderColor: "rgb(20, 20, 20)",
                     borderWidth: 0.5,
@@ -200,5 +207,5 @@ export default function Sankey({
         chart.setOption(option);
     }, [data]);
 
-    return <div ref={chartRef} style={{ width: width, height: height }}></div >
+    return <div ref={chartRef} className={className}></div >;
 }
