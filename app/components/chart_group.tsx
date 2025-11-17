@@ -20,8 +20,10 @@ interface DataColumns
 
 export default function ChartGroup({
     rawDegreeData,
+    className = ""
 }: Readonly<{
-    rawDegreeData: Array<DataColumns>;
+    rawDegreeData: Array<DataColumns>,
+    className: string
 }>) {
     const enum Campus {
         Manoa = "UH Manoa",
@@ -52,9 +54,22 @@ export default function ChartGroup({
     const [year, setYear] = useState(Year.Y2025);
     const filteredData = rawDegreeData.filter(item => item.CAMPUS == campus && item.FISCAL_YEAR == year);
 
+    /*
+    * TODO
+    * - Line chart
+    * - Pie/donut chart
+    * - Utilize useState to change and select campus and year?
+    */
+
     return (
-        <div className="bg-red-50 flex-auto w-2/3 h-full">
-            <Sankey data={filteredData} className="w-lg h-100" />
+        <div className={className}>
+            <div className="bg-green-50 row-start-1 col-span-10">
+                { /*Insert line charts here*/ }
+            </div>
+            <div className="bg-yellow-50 row-start-2 row-span-2 col-span-10 grid grid-cols-subgrid">
+                { /*Insert pie/donut chart here*/ }
+                <Sankey data={filteredData} className="col-start-6 col-span-5" />
+            </div>
         </div>
     );
 }

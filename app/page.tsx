@@ -19,11 +19,18 @@ export default async function Page() {
             AWARDS: +d.AWARDS
         };
     }));
+
+    /*
+    * TODO
+    * - Website title
+    * - Info panel on the left
+    * - Work on front-end visuals
+    */
     
     return (
-        <div className="flex h-screen">
-            <div className="bg-blue-50 flex-none w-1/3 h-full"></div>
-            <ChartGroup rawDegreeData={rawDegreeData} />
+        <div className="grid grid-cols-10 grid-row-1 h-screen mx-4">
+            <div className="bg-blue-50 col-span-3"></div>
+            <ChartGroup rawDegreeData={rawDegreeData} className="col-span-7 grid grid-cols-10 grid-rows-3" />
         </div>
     );
 }

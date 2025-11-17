@@ -133,6 +133,7 @@ export default function Sankey({
     className = "",
 }) {
     const chartRef = useRef(null);
+    const option = useRef({});
 
     useEffect(() => {
         const chart = init(chartRef.current);
@@ -146,7 +147,7 @@ export default function Sankey({
         const chart = getInstanceByDom(chartRef.current);
         const sankeyData = sankeyDataProcess(data);
 
-        let option = {
+        option.current = {
             backgroundColor: "rgba(0, 18, 3, 1)",
             tooltip: {
                 trigger: "item",
@@ -154,7 +155,7 @@ export default function Sankey({
             },
             series: {
                 type: "sankey",
-                width: "80%",
+                width: "75%",
                 height: "90%",
                 data: sankeyData.nodes,
                 links: sankeyData.links,
@@ -204,7 +205,7 @@ export default function Sankey({
             },
         };
 
-        chart.setOption(option);
+        chart.setOption(option.current);
     }, [data]);
 
     return <div ref={chartRef} className={className}></div >;
