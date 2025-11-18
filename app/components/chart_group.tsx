@@ -63,12 +63,12 @@ export default function ChartGroup({
 
     return (
         <div className={className}>
-            <div className="bg-green-50 row-start-1 col-span-10">
+            <div className="bg-green-100 row-start-1 col-span-10">
                 { /*Insert line charts here*/ }
             </div>
-            <div className="bg-yellow-50 row-start-2 row-span-2 col-span-10 grid grid-cols-subgrid">
+            <div className="bg-yellow-100 row-start-2 row-span-2 col-span-10 grid grid-cols-subgrid">
                 { /*Insert pie/donut chart here*/ }
-                <Sankey data={filteredData} className="col-start-6 col-span-5" />
+                <Sankey data={filteredData} className="col-start-6 col-span-5 bg-purple-100 rounded-[50px] p-4 m-4" />
             </div>
         </div>
     );

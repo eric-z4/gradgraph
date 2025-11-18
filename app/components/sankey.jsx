@@ -148,7 +148,6 @@ export default function Sankey({
         const sankeyData = sankeyDataProcess(data);
 
         option.current = {
-            backgroundColor: "rgba(0, 18, 3, 1)",
             tooltip: {
                 trigger: "item",
                 triggerOn: "mousemove",

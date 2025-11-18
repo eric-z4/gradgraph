@@ -28,7 +28,7 @@ export default async function Page() {
     */
     
     return (
-        <div className="grid grid-cols-10 grid-row-1 h-screen mx-4">
+        <div className="grid grid-cols-10 grid-row-1 h-screen px-4">
             <div className="bg-blue-50 col-span-3"></div>
             <ChartGroup rawDegreeData={rawDegreeData} className="col-span-7 grid grid-cols-10 grid-rows-3" />
         </div>
