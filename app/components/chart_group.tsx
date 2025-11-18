@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Sankey from "./sankey";
+import Donut from "./donut";
 
 interface DataColumns
 {
@@ -67,7 +68,7 @@ export default function ChartGroup({
                 { /*Insert line charts here*/ }
             </div>
             <div className="bg-yellow-100 row-start-2 row-span-2 col-span-10 grid grid-cols-subgrid">
-                { /*Insert pie/donut chart here*/ }
+                <Donut />
                 <Sankey data={filteredData} className="col-start-6 col-span-5 bg-purple-100 rounded-[50px] p-4 m-4" />
             </div>
         </div>
