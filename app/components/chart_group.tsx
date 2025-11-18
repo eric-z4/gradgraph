@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Sankey from "./sankey";
+import LineChartSchoolTrends from "./line-chart-school-trends";
 
 interface DataColumns
 {
@@ -63,8 +64,17 @@ export default function ChartGroup({
 
     return (
         <div className={className}>
-            <div className="bg-green-100 row-start-1 col-span-10">
-                { /*Insert line charts here*/ }
+            {/* Row with 3 line charts */}
+            <div className="bg-green row-start-1 col-span-10 flex flex-wrap gap-4 mt-4 mb-4">
+                <div className="flex-1 col-span-3">
+                    <LineChartSchoolTrends rawDegreeData={rawDegreeData} campus={campus}  />
+                </div>
+                <div className="flex-1 col-span-3">
+                    <LineChartSchoolTrends rawDegreeData={rawDegreeData} campus={Campus.Hilo} lineColor="green" />
+                </div>
+                <div className="flex-1 col-span-3">
+                    <LineChartSchoolTrends rawDegreeData={rawDegreeData} campus={Campus.WestOahu} lineColor="red" />
+                </div>
             </div>
             <div className="bg-yellow-100 row-start-2 row-span-2 col-span-10 grid grid-cols-subgrid">
                 { /*Insert pie/donut chart here*/ }
