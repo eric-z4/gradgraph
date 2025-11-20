@@ -31,7 +31,7 @@ interface LineChartProps {
 export default function LineChartSchoolTrends({
   rawDegreeData,
   campus,
-  lineColor = "",
+  lineColor = "rgb(29, 120, 180)",
   className = "",
 }: LineChartProps) {
   // Memoize data to avoid unnecessary re-renders
@@ -63,10 +63,38 @@ export default function LineChartSchoolTrends({
     }, [rawDegreeData, campus]);
 
     // Round up yMax to nearest 1000
-    const yAxisMax = Math.ceil(yMax / 1000) * 1000;
+    // const yAxisMax = Math.ceil(yMax / 1000) * 1000;
+    // Dynamic Y axis logic
+    const { yAxisMax, yTick } = useMemo(() => {
+      if (yMax < 1000) {
+        return { yAxisMax: 1200, yTick: 200 };
+      }
+      return {
+        yAxisMax: Math.ceil(yMax / 1000) * 1000,
+        yTick: 1000,
+      };
+    }, [yMax]);
 
      // State for vertical line position
     const [vlineX, setVlineX] = useState(x[Math.floor(x.length / 2)]);
+
+    const [markerY, setMarkerY] = useState(y[8]);
+
+    function snapToNearest(targetX: number) {
+      let nearestIndex = 0;
+      let minDist = Infinity;
+
+      x.forEach((val, i) => {
+        const dist = Math.abs(val - targetX);
+        if (dist < minDist) {
+          minDist = dist;
+          nearestIndex = i;
+        }
+      });
+
+      return { x: x[nearestIndex], y: y[nearestIndex] };
+    }
+
 
   return (
     <div className={className}>
@@ -81,38 +109,46 @@ export default function LineChartSchoolTrends({
             showlegend: false,
           },
           {
-            // Vertical line as a scatter trace with two points
-            x: [vlineX, vlineX],
-            y: [0, yAxisMax],
+            // Vertical line as a scatter trace with 1 point
+            x: [vlineX],
+            y: [markerY],
             type: "scatter",
-            mode: "lines+markers", // markers needed for draggable points
-            marker: { size: 10, color: "red" },
-            line: { color: "red", width: 2 },
-            hoverinfo: "none",
+            mode: "markers",
+            marker: {
+              size: 12,
+              color: lineColor,
+              line: { width: 2, color: "rgba(248, 85, 85, 1)" }
+            },
+            hoverinfo: "skip",
             showlegend: false,
           },
         ]}
         layout={{
-          title: { text: `${campus}` },
+          // title: { text: `${campus}` },
           dragmode: "x", // enables horizontal dragging of points
+          height: 220,
+          margin: { t: 10, r: 10, l: 50, b: 30 },
+          automargin: true,
+          autosize: true,
           xaxis: {
                 title: {
-                    text: 'Year'
+                    text: 'Year', font: { size: 12 }
                 },
+                tickfont: { size: 10 },
                 tickmode: 'linear',
                 dtick: 3,             // interval of tickmarks
                 range: [2009.6, 2025.25] // adjust padding of x-axis for visual readability
             },
           yaxis: {
                 title: {
-                    text: 'Total Degrees',
+                    text: 'Total Degrees', font: { size: 12 },
                     standoff: 10
                 },
+                tickfont: { size: 10 }, 
                 tickmode: 'linear',
-                dtick: 1000,
-                range: [-200, yAxisMax]  // adjust padding of y-axis for visual readability
+                dtick: yTick,
+                range: [0, yAxisMax]  // adjust padding of y-axis for visual readability
             },
-          margin: { t: 40, r: 20, l: 70, b: 70 },
           shapes: [
             {
               type: "line",
@@ -120,20 +156,22 @@ export default function LineChartSchoolTrends({
               x1: vlineX,
               y0: 0,
               y1: yAxisMax,
-              line: { color: "red", width: 2 },
+              line: { color: "rgba(248, 85, 85, 0.7)", width: 2 },
+              layer: "below",
             },
           ],
-          // This makes shapes draggable
+          // This makes shapes draggable?
           editable: true,
-        //   height: 350,
-        //   width: 300,
           hovermode: "closest",
         } as any}
-        style={{ width: "100%", height: 350 }}
-        onRelayout={(event) => {
-          const e = event as any;
-          if (e["shapes[0].x0"] !== undefined) {
-            setVlineX(e["shapes[0].x0"]);
+        style={{ width: "100%", height: "100%" }}
+        onRelayout={(ev: any) => {
+          if (ev["shapes[0].x0"] !== undefined) {
+            const newX = ev["shapes[0].x0"];
+            const snapped = snapToNearest(newX);
+
+            setVlineX(snapped.x);
+            setMarkerY(snapped.y);
           }
         }}
       />
@@ -142,7 +180,7 @@ export default function LineChartSchoolTrends({
 }
 
 
-
+// ChartJS implementation
 // import { Line } from "react-chartjs-2";
 // import {
 //     Chart as ChartJS,

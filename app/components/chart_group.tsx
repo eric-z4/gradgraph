@@ -56,26 +56,74 @@ export default function ChartGroup({
     const [year, setYear] = useState(Year.Y2025);
     const filteredData = rawDegreeData.filter(item => item.CAMPUS == campus && item.FISCAL_YEAR == year);
 
+    // Interactive chart selection: tracking selected linechart for emphasis
+    const [selectedCampus, setSelectedCampus] = useState<string | null>(null);
+
+    const renderChart = (campusName: string, lineColor?: string) => {
+        const borderColor = lineColor || "#3b82f6"; // default blue
+        const glowColor = lineColor ? `${lineColor}FF` : "rgba(59, 130, 246, 0.5)"; 
+        const glowSelectedColor = lineColor ? `${lineColor}FF` : "rgba(96, 165, 250, 0.7)"; 
+
+        return (
+            <div
+            className={`chart-card ${selectedCampus === campusName ? "selected" : ""}`}
+            onClick={() => setSelectedCampus(campusName)}
+            style={{
+                "--border-color": borderColor,
+                "--glow-hover-color": glowColor,
+                "--glow-selected-color": glowSelectedColor,
+                borderColor: lineColor,
+            } as React.CSSProperties} // cast for TS
+        >
+            <span className="font-bold">{campusName}</span>
+            <LineChartSchoolTrends
+                rawDegreeData={rawDegreeData}
+                campus={campusName}
+                lineColor={lineColor}
+                className="pt-1 pe-2"
+            />
+        </div>
+        );
+    };
+
     /*
     * TODO
-    * - Line chart
-    * - Pie/donut chart
     * - Utilize useState to change and select campus and year?
     */
 
     return (
         <div className={className}>
             {/* Row with 3 line charts */}
-            <div className="bg-green row-start-1 col-span-10 flex flex-wrap gap-4 mt-4 mb-4">
-                <div className="flex-1 col-span-3">
-                    <LineChartSchoolTrends rawDegreeData={rawDegreeData} campus={campus}  />
+            <div className="bg-green-100 grid grid-cols-9 row-start-1 col-span-10">
+                {/* <div className="col-start-1 col-span-3 bg-white rounded-[25px] h-[270px] px-3 py-2 m-4 text-center">
+                    <span className="font-bold">UH Manoa</span> 
+                    <LineChartSchoolTrends 
+                        rawDegreeData={rawDegreeData} 
+                        campus={campus}
+                        className="pt-1"
+                    />
                 </div>
-                <div className="flex-1 col-span-3">
-                    <LineChartSchoolTrends rawDegreeData={rawDegreeData} campus={Campus.Hilo} lineColor="green" />
+                <div className="col-start-4 col-span-3 bg-white rounded-[25px] h-[270px] px-3 py-2 m-4 text-center">
+                    <span className="font-bold">UH Hilo</span> 
+                    <LineChartSchoolTrends 
+                        rawDegreeData={rawDegreeData} 
+                        campus={Campus.Hilo} 
+                        lineColor="green"
+                        className="pt-1"
+                    />
                 </div>
-                <div className="flex-1 col-span-3">
-                    <LineChartSchoolTrends rawDegreeData={rawDegreeData} campus={Campus.WestOahu} lineColor="red" />
-                </div>
+                <div className="col-start-7 col-span-3 bg-white rounded-[25px] h-[270px] px-3 py-2 m-4 text-center">
+                    <span className="font-bold">UH West Oahu</span> 
+                    <LineChartSchoolTrends 
+                        rawDegreeData={rawDegreeData} 
+                        campus={Campus.WestOahu} 
+                        lineColor="purple"
+                        className="pt-1"
+                    />
+                </div> */}
+                <div className="col-start-1 col-span-3">{renderChart(Campus.Manoa)}</div>
+                <div className="col-start-4 col-span-3">{renderChart(Campus.Hilo, "#008001")}</div>
+                <div className="col-start-7 col-span-3">{renderChart(Campus.WestOahu, "#800080")}</div>
             </div>
             <div className="bg-yellow-100 row-start-2 row-span-2 col-span-10 grid grid-cols-subgrid">
                 <Donut data={filteredData} />

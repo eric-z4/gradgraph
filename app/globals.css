@@ -1,1 +1,34 @@
 @import "tailwindcss";
+
+/* Hover animation effect for charts */
+.chart-card {
+  /* Default border, glow, and selected glow colors */
+  --border-color: #3b82f6; 
+  --glow-hover-color: rgba(59, 130, 246, 0.5); 
+  --glow-selected-color: rgba(96, 165, 250, 0.7);
+
+  transition: transform 0.2s ease, border 0.2s ease, box-shadow 0.2s ease;
+  border-radius: 25px;
+  background-color: white;
+  height: 275px;
+  padding: 0.5rem;
+  margin: 1rem;
+  text-align: center;
+  cursor: pointer;
+}
+
+/* Hover animation effect: soft blue glow and scale */
+.chart-card:hover {
+  transform: scale(1.05);
+  border: 2px solid var(--border-color); 
+  box-shadow: 0 0 15px var(--glow-hover-color), 
+              0 10px 15px rgba(0, 0, 0, 0.2); /* subtle shadow */
+}
+
+/* Select line chart animation effect: strong blue glow and scale */
+.chart-card.selected {
+  transform: scale(1.05);
+  border: 4px solid var(--border-color); /* blue-400 */
+  box-shadow: 0 0 25px var(--glow-selected-color), /* blue-400 glow */
+              0 20px 30px rgba(0, 0, 0, 0.3);  /* deeper shadow */
+}
