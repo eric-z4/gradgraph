@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import * as echarts from "echarts";
+import * as d3 from "d3";
 
 function donutDataProcess(data) {
     if (!data || !Array.isArray(data)) {
@@ -12,7 +13,8 @@ function donutDataProcess(data) {
         new Set(data.map(d => d.GROUP1).filter(Boolean))
     );
 
-    const seriesData = colleges.map(college => {
+    // Calculate total awards for each college and sort by degree count (descending)
+    const collegeData = colleges.map(college => {
         const totalAwards = data
             .filter(d => d.GROUP1 === college)
             .reduce((sum, d) => sum + Number(d.AWARDS || 0), 0);
@@ -21,10 +23,24 @@ function donutDataProcess(data) {
             name: college,
             value: totalAwards
         };
+    }).sort((a, b) => b.value - a.value);
+
+    // Match D3 color scheme of Sankey chart
+    const colors = collegeData.map((_, i) => {
+        const hslColor = d3.hsl(360 * (i / collegeData.length), 1.0, 0.65);
+        return d3.rgb(hslColor).toString();
+    });
+
+    const seriesData = collegeData.map((item, i) => {
+        return {
+            name: item.name,
+            value: item.value,
+            itemStyle: { color: colors[i] }
+        };
     });
 
     return {
-        legendData: colleges,
+        legendData: collegeData.map(d => d.name),
         seriesData
     };
 }
@@ -71,7 +87,8 @@ export default function Donut({ data }) {
         },
         itemGap: 6,
         itemWidth: 10,
-        itemHeight: 10
+        itemHeight: 10,
+        selectedMode: false
       },
       series: [
         {
