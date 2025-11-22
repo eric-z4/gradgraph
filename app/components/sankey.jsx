@@ -107,7 +107,7 @@ function sankeyDataProcess(data) {
                 itemStyle: { color: tempColorsArr[i][j] },
                 label: {
                     formatter: (d) => {
-                        return d.name.slice(0, -1).length > 23 ? d.name.slice(0, -1).slice(0, 23) + "..." : d.name.slice(0, -1);
+                        return d.name.slice(0, -1).length > 16 ? d.name.slice(0, -1).slice(0, 16) + "..." : d.name.slice(0, -1);
                     }
                 },
             }
@@ -169,7 +169,8 @@ export default function Sankey({
                 roam: true,
                 scaleLimit: { min: 1, max: 3 },
                 label: {
-                    fontSize: 9
+                    fontSize: 9,
+                    fontFamily: "Verdana, sans-serif"
                 },
                 itemStyle: {
                     borderColor: "rgb(20, 20, 20)",
