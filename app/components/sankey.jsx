@@ -135,19 +135,22 @@ export default function Sankey({
     const chartRef = useRef(null);
     const option = useRef({});
 
+    // Echart initialization
     useEffect(() => {
         const chart = init(chartRef.current);
 
-        return () => {
-            chart?.dispose();
-        };
-    }, []);
-
-    useEffect(() => {
-        const chart = getInstanceByDom(chartRef.current);
-        const sankeyData = sankeyDataProcess(data);
-
         option.current = {
+            title: {
+                text: "Degrees Awarded Breakdown",
+                top: 0,
+                textStyle: {
+                    fontSize: 14
+                },
+                subtextStyle: {
+                    fontSize: 12
+                }
+            },
+            backgroundColor: "rgba(0, 0, 0, 0)",
             tooltip: {
                 trigger: "item",
                 triggerOn: "mousemove",
@@ -156,16 +159,17 @@ export default function Sankey({
                 type: "sankey",
                 width: "75%",
                 height: "90%",
-                data: sankeyData.nodes,
-                links: sankeyData.links,
+                data: [],
+                links: [],
                 nodeAlign: "left",
                 nodeWidth: 16,
                 nodeGap: 3,
                 layoutIterations: 0,
                 draggable: false,
                 roam: true,
+                scaleLimit: { min: 1, max: 3 },
                 label: {
-                    fontSize: 8
+                    fontSize: 9
                 },
                 itemStyle: {
                     borderColor: "rgb(20, 20, 20)",
@@ -183,7 +187,17 @@ export default function Sankey({
                 animationDuration: 500,
                 animationEasing: "circularIn",
                 tooltip: {
-                    formatter: function (params) {
+                    position: function (point, params, dom, rect, size)
+                    {
+                        const offset = 20;
+                        let obj = {
+                            top: point[1] + offset,
+                            left: point[0] - dom.offsetWidth - offset
+                        };
+                        return obj;
+                    },
+                    formatter: function (params)
+                    {
                         if (params.dataType === "edge") {
                             return `<span style="font-weight:400;">
                                 ${params.data.source.slice(0, -1) + " --> " + params.data.target.slice(0, -1)}
@@ -204,8 +218,33 @@ export default function Sankey({
             },
         };
 
+        // Resize chart on window resize
+        function handleResize() {
+            chart.resize();
+        };
+        window.addEventListener("resize", handleResize);
+
+        return () => {
+            chart?.dispose();
+            window.removeEventListener("resize", handleResize);
+        };
+    }, []);
+
+    // Update sankey with new data
+    useEffect(() => {
+        const chart = getInstanceByDom(chartRef.current);
+        const sankeyData = sankeyDataProcess(data);
+
+        option.current.series.data = sankeyData.nodes;
+        option.current.series.links = sankeyData.links;
+
         chart.setOption(option.current);
     }, [data]);
 
-    return <div ref={chartRef} className={className}></div >;
+    return <div ref={chartRef} className={className} onDoubleClick={() => {
+        // Reset zoom and center on double click
+        option.current.series.zoom = 1;
+        option.current.series.center = ["50%", "50%"];
+        getInstanceByDom(chartRef.current).setOption(option.current);
+    }}></div >;
 }
