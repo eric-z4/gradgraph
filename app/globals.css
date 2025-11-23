@@ -3,10 +3,11 @@
 @theme {
     --color-primary-1: #024731;
     --color-primary-2: #022647;
-    --color-primary-3: #a71930;
-    --color-highlight-1: #b3995d;
-    --color-neutral-1: #3c4544;
-    --color-neutral-2: #212529;
+    /*--color-primary-3: #a71930;
+    --color-highlight-1: #b3995d;*/
+    --color-neutral-1: #f0f7ff;
+    --color-neutral-2: #3c4544;
+    --color-neutral-3: #212529;
 }
 
 /* Hover animation effect for charts */
