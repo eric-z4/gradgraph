@@ -3,6 +3,7 @@
 import * as d3 from "d3";
 import { getInstanceByDom, init } from "echarts";
 import { useEffect, useRef } from "react";
+import { useSankeyAndDonutSync } from "../SankeyAndDonutSync";
 
 function sankeyDataProcess(data) {
     //GROUPING
@@ -133,11 +134,16 @@ export default function Sankey({
     className = "",
 }) {
     const chartRef = useRef(null);
+    const chartInstance = useRef(null);
     const option = useRef({});
+    const { hoveredCollege, setHoveredCollege } = useSankeyAndDonutSync();
 
     // Echart initialization
     useEffect(() => {
+        if (!chartRef.current) return;
+        
         const chart = init(chartRef.current);
+        chartInstance.current = chart;
 
         option.current = {
             title: {
@@ -219,6 +225,26 @@ export default function Sankey({
             },
         };
 
+        // Add event listeners for hover sync
+        chart.on("mouseover", (params) => {
+            if (params.dataType === "node" && params.data.depth === 1) {
+                // Only sync for GROUP1 nodes (colleges)
+                const nodeIndex = params.dataIndex - 1; // Subtract 1 for "Total" node
+                if (nodeIndex >= 0) {
+                    // Downplay all nodes first, then highlight will happen via sync
+                    chart.dispatchAction({
+                        type: "downplay",
+                        seriesIndex: 0,
+                    });
+                    setHoveredCollege(nodeIndex);
+                }
+            }
+        });
+
+        chart.on("mouseout", () => {
+            setHoveredCollege(null);
+        });
+
         // Resize chart on window resize
         function handleResize() {
             chart.resize();
@@ -229,7 +255,32 @@ export default function Sankey({
             chart?.dispose();
             window.removeEventListener("resize", handleResize);
         };
-    }, []);
+    }, [setHoveredCollege]);
+
+    // Handle hover from donut chart
+    useEffect(() => {
+        if (!chartInstance.current) return;
+
+        if (hoveredCollege != null) {
+            // Highlight the corresponding college node (add 1 for "Total" node offset)
+            chartInstance.current.dispatchAction({
+                type: "highlight",
+                seriesIndex: 0,
+                dataIndex: hoveredCollege + 1,
+            });
+            chartInstance.current.dispatchAction({
+                type: "showTip",
+                seriesIndex: 0,
+                dataIndex: hoveredCollege + 1,
+            });
+        } else {
+            chartInstance.current.dispatchAction({
+                type: "downplay",
+                seriesIndex: 0,
+            });
+            chartInstance.current.dispatchAction({ type: "hideTip" });
+        }
+    }, [hoveredCollege]);
 
     // Update sankey with new data
     useEffect(() => {

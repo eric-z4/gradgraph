@@ -4,6 +4,7 @@ import { useState } from "react";
 import Sankey from "./sankey";
 import LineChartSchoolTrends from "./line-chart-school-trends";
 import Donut from "./donut";
+import { SankeyAndDonutSyncProvider } from "../SankeyAndDonutSync";
 
 interface DataColumns
 {
@@ -126,8 +127,10 @@ export default function ChartGroup({
                 <div className="col-start-7 col-span-3">{renderChart(Campus.WestOahu, "#800080")}</div>
             </div>
             <div className="row-start-2 row-span-2 col-span-10 grid grid-cols-subgrid">
-                <Donut data={filteredData} />
-                <Sankey data={filteredData} className="col-start-6 col-span-5 bg-white border border-neutral-2 rounded-[50px] p-4 m-4" />
+                <SankeyAndDonutSyncProvider>
+                    <Donut data={filteredData} />
+                    <Sankey data={filteredData} className="col-start-6 col-span-5 bg-white border border-neutral-2 rounded-[50px] p-4 m-4" />
+                </SankeyAndDonutSyncProvider>
             </div>
         </div>
     );

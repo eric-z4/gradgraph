@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import * as echarts from "echarts";
 import * as d3 from "d3";
+import { useSankeyAndDonutSync } from "../SankeyAndDonutSync";
 
 function donutDataProcess(data) {
     if (!data || !Array.isArray(data)) {
@@ -48,14 +49,56 @@ function donutDataProcess(data) {
 export default function Donut({ data }) {
   const chartRef = useRef(null);
   const chartInstance = useRef(null);
+  const { hoveredCollege, setHoveredCollege } = useSankeyAndDonutSync();
 
   useEffect(() => {
     if (!chartRef.current) return;
 
-    // Initialize chart once
-    if (!chartInstance.current) {
-      chartInstance.current = echarts.init(chartRef.current);
+    chartInstance.current = echarts.init(chartRef.current);
+
+    chartInstance.current.on("mouseover", params => {
+      if (params.dataIndex != null) {
+        // Downplay all slices first, then highlight the current one
+        chartInstance.current.dispatchAction({
+          type: "downplay",
+          seriesIndex: 0,
+        });
+        setHoveredCollege(params.dataIndex);
+      }
+    });
+
+    chartInstance.current.on("mouseout", () => {
+      setHoveredCollege(null);
+    });
+
+    return () => {
+      chartInstance.current?.dispose();
+      chartInstance.current = null;
+    };
+  }, [setHoveredCollege]);
+
+  useEffect(() => {
+    if (!chartInstance.current) return;
+
+    if (hoveredCollege != null) {
+        chartInstance.current.dispatchAction({
+        type: "highlight",
+        seriesIndex: 0,
+        dataIndex: hoveredCollege,
+      });
+      chartInstance.current.dispatchAction({
+        type: "showTip",
+        seriesIndex: 0,
+        dataIndex: hoveredCollege,
+      });
+    } else {
+      chartInstance.current.dispatchAction({ type: "downplay", seriesIndex: 0 });
+      chartInstance.current.dispatchAction({ type: "hideTip" });
     }
+  }, [hoveredCollege]);
+
+  useEffect(() => {
+    if (!chartInstance.current) return;
 
     const { legendData, seriesData } = donutDataProcess(data);
 
@@ -77,7 +120,6 @@ export default function Donut({ data }) {
         formatter: "{a} <br/>{b} : {c} ({d}%)"
       },
       legend: {
-        // type: "scroll",
         orient: "horizontal",
         left: "center",
         bottom: 0,
@@ -113,14 +155,6 @@ export default function Donut({ data }) {
     };
       chartInstance.current.setOption(option);
   }, [data]);
-
-  useEffect(() => {
-    // Cleanup only on unmount
-    return () => {
-      chartInstance.current?.dispose();
-      chartInstance.current = null;
-    };
-  }, []);
 
   return (
       <div className="col-start-1 col-span-5 bg-white border border-neutral-2 rounded-[50px] p-2 m-4 flex items-center justify-center">
