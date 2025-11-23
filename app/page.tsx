@@ -29,11 +29,11 @@ export default async function Page() {
     */
     
     return (
-        <div className="grid grid-cols-10 grid-row-1 h-screen px-4">
-            <div className="grid grid-cols-10 grid-row-3 bg-blue-50 col-span-3">
-                <InfoBox className="text-center col-start-2 col-span-8 row-start-2 place-content-center h-screen" />
+        <div className="grid grid-cols-10 grid-row-1 h-screen">
+            <div className="bg-primary-2 col-span-3">
+                <InfoBox className="text-center flex h-screen p-4" />
             </div>
-            <ChartGroup rawDegreeData={rawDegreeData} className="col-span-7 grid grid-cols-10 grid-rows-3" />
+            <ChartGroup rawDegreeData={rawDegreeData} className="bg-primary-2 col-span-7 grid grid-cols-10 grid-rows-3" />
         </div>
     );
 }

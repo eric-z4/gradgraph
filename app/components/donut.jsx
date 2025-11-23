@@ -123,7 +123,7 @@ export default function Donut({ data }) {
   }, []);
 
   return (
-    <div className="col-start-1 col-span-5 bg-orange-100 rounded-[50px] p-2 m-4 flex items-center justify-center">
+      <div className="col-start-1 col-span-5 bg-white border border-neutral-2 rounded-[50px] p-2 m-4 flex items-center justify-center">
       <div
         ref={chartRef}
         style={{ width: "95%", height: "95%" }}

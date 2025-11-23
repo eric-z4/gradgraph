@@ -94,7 +94,7 @@ export default function ChartGroup({
     return (
         <div className={className}>
             {/* Row with 3 line charts */}
-            <div className="bg-green-100 grid grid-cols-9 row-start-1 col-span-10">
+            <div className="grid grid-cols-9 row-start-1 col-span-10">
                 {/* <div className="col-start-1 col-span-3 bg-white rounded-[25px] h-[270px] px-3 py-2 m-4 text-center">
                     <span className="font-bold">UH Manoa</span> 
                     <LineChartSchoolTrends 
@@ -125,9 +125,9 @@ export default function ChartGroup({
                 <div className="col-start-4 col-span-3">{renderChart(Campus.Hilo, "#008001")}</div>
                 <div className="col-start-7 col-span-3">{renderChart(Campus.WestOahu, "#800080")}</div>
             </div>
-            <div className="bg-yellow-100 row-start-2 row-span-2 col-span-10 grid grid-cols-subgrid">
+            <div className="row-start-2 row-span-2 col-span-10 grid grid-cols-subgrid">
                 <Donut data={filteredData} />
-                <Sankey data={filteredData} className="col-start-6 col-span-5 bg-purple-100 rounded-[50px] p-4 m-4" />
+                <Sankey data={filteredData} className="col-start-6 col-span-5 bg-white border border-neutral-2 rounded-[50px] p-4 m-4" />
             </div>
         </div>
     );
