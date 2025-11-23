@@ -23,17 +23,18 @@ export default function InfoBox({
     return (
         <div className={`${className} relative`}>
             <div className={`bg-white border border-neutral-2 rounded-4xl p-4 overflow-auto transition-opacity duration-300 ${showInfoCard ? 'opacity-50' : 'opacity-100'}`}>
-                <p className="text-5xl font-bold pb-4">
+                <h1 className="text-5xl font-semibold pb-4">
                     GradGraph
                     <button 
                         type="button" 
-                        className="inline-flex items-center justify-center cursor-pointer transition-transform hover:scale-110"
-                        onClick={() => setShowInfoCard(!showInfoCard)}
+                        className="flex-shrink-0 p-1.5 rounded-full hover:bg-neutral-1/10 transition-all cursor-pointer hover:scale-110"
+                        onClick={() => setShowInfoCard(true)}
+                        aria-label="Learn more about GradGraph"
                     >
-                        <BsInfoCircle className="w-6 h-6 text-body hover:text-heading ms-2 transition-colors" />
+                        <BsInfoCircle className="w-5 h-5 ml-2 text-neutral-2 hover:text-primary-2 transition-colors"/>
                     </button>
-                </p>
-                <hr className="outline outline-1 outline-primary-2"></hr>
+                </h1>
+                <hr className="border-t border-neutral-2/30"></hr>
                 <p className="pt-3 text-left">
                     {infoText}
                 </p>
@@ -45,7 +46,7 @@ export default function InfoBox({
                     onClick={() => setShowInfoCard(false)}
                 >
                     <div 
-                        className="bg-white border-2 border-primary-2 rounded-3xl p-6 shadow-2xl max-w-md w-96 animate-bounce-in"
+                        className="bg-white border border-neutral-2/40 rounded-2xl p-8 shadow-xl max-w-lg w-full mx-4 animate-fade-in"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="flex justify-between items-start mb-4">
@@ -55,18 +56,17 @@ export default function InfoBox({
                             <button 
                                 onClick={() => setShowInfoCard(false)}
                                 className="cursor-pointer transition-all hover:scale-125"
+                                aria-label="Close"
                             >
-                                <BsX className="w-6 h-6 text-body hover:text-heading mt-1"/>
+                                <BsX className="w-7 h-7 mt-1 text-neutral-2 hover:text-heading transition-colors"/>
                             </button>
                         </div>
-                        <div className="text-left">
-                            <p>
+                        <div className="text-left space-y-4">
+                            <p className="text-body leading-relaxed">
                                 GradGraph allows you to look at the degrees awarded across the three main University of Hawaii campuses: UH Manoa, UH Hilo, and UH West Oahu. You can explore the distribution of degrees across various colleges and see the trends over different fiscal years.
                             </p>
-                        </div>
-                        <div className="text-left mt-4">
-                            <p>
-                                Made by <a href="https://github.com/eric-z4" target="_blank" rel="noopener noreferrer"><span className='underline hover:text-blue-600'>Eric Zhou</span></a>, <a href="https://github.com/jpinera" target="_blank" rel="noopener noreferrer"><span className='underline hover:text-blue-600'>Jaren Pinera</span></a>, and <a href="https://github.com/usradam" target="_blank" rel="noopener noreferrer"><span className='underline hover:text-blue-600'>Adam Graham</span></a>
+                            <p className="text-sm text-neutral-2 pt-2 border-t border-neutral-2/20">
+                                Created by <a href="https://github.com/eric-z4" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-600 transition-colors">Eric Zhou</a>, <a href="https://github.com/jpinera" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-600 transition-colors">Jaren Pinera</a>, and <a href="https://github.com/usradam" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-600 transition-colors">Adam Graham</a>
                             </p>
                         </div>
                     </div>
