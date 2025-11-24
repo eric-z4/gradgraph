@@ -13,11 +13,11 @@ export default function InfoBox({
     const getInfoText = (campusName) => {
         switch(campusName) {
             case "UH Manoa":
-                return "Founded in 1907, the University of Hawaiʻi at Mānoa is a destination of choice for students and faculty from across the nation and the world. UH Mānoa offers unique research opportunities, a diverse community, a nationally-ranked Division I athletics program and much more.";
+                return "[UH Manoa data viz stuff goes here]";
             case "UH Hilo":
-                return "The University of Hawaiʻi at Hilo (UH Hilo) is a public university in Hilo, Hawaiʻi, United States. It was founded as Hilo Center at Lyman Hall of the Hilo Boys School in 1945 and was a branch campus of the University of Hawaiʻi at Mānoa. In 1970 it was reorganized by an act of the Hawaiʻi State Legislature and became a campus within the newly created University of Hawaiʻi System.";
-            case "UH West Oʻahu":
-                return "The University of Hawaiʻi–West Oʻahu is a public university in Kapolei, Hawaiʻi. As part of the University of Hawaiʻi system, UH West Oʻahu offers baccalaureate and graduate degrees in liberal arts and professional studies, serving the leeward coast and central Oʻahu communities.";
+                return "[UH Hilo data viz stuff goes here]";
+            case "UH West O`ahu":
+                return "[UH West Oʻahu data viz stuff goes here]";
             default:
                 return "Select a campus to view detailed information about its degree distribution.";
         }
