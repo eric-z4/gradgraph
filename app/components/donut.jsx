@@ -46,7 +46,7 @@ function donutDataProcess(data) {
     };
 }
 
-export default function Donut({ data }) {
+export default function Donut({ data, campus }) {
   const chartRef = useRef(null);
   const chartInstance = useRef(null);
   const { hoveredCollege, setHoveredCollege } = useSankeyAndDonutSync();
@@ -104,7 +104,7 @@ export default function Donut({ data }) {
 
     const option = {
       title: {
-        text: "UH Manoa Degrees Awarded",
+        text: `${campus} Degrees Awarded`,
         subtext: "Fiscal Year 2025",
             left: "center",
         top: 0,

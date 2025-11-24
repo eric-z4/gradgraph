@@ -131,6 +131,7 @@ https://www.taniarascia.com/apache-echarts-react/
 */
 export default function Sankey({
     data,
+    campus,
     className = "",
 }) {
     const chartRef = useRef(null);
@@ -147,7 +148,7 @@ export default function Sankey({
 
         option.current = {
             title: {
-                text: "Degrees Awarded Breakdown",
+                text: `${campus} Degrees Awarded Breakdown`,
                 top: 0,
                 textStyle: {
                     fontSize: 14
@@ -289,9 +290,10 @@ export default function Sankey({
 
         option.current.series.data = sankeyData.nodes;
         option.current.series.links = sankeyData.links;
+        option.current.title.text = `${campus} Degrees Awarded Breakdown`;
 
         chart.setOption(option.current);
-    }, [data]);
+    }, [data, campus]);
 
     return <div ref={chartRef} className={className} onDoubleClick={() => {
         // Reset zoom and center on double click

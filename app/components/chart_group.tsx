@@ -53,12 +53,14 @@ export default function ChartGroup({
         Y2025 = "Fiscal Year 2025",
     };
 
-    const [campus, setCampus] = useState(Campus.Manoa);
+    const [campus, setCampus] = useState<string>(Campus.Manoa);
     const [year, setYear] = useState(Year.Y2025);
     const filteredData = rawDegreeData.filter(item => item.CAMPUS == campus && item.FISCAL_YEAR == year);
 
     // Interactive chart selection: tracking selected linechart for emphasis
-    const [selectedCampus, setSelectedCampus] = useState<string | null>(null);
+    const handleCampusClick = (campusName: string) => {
+        setCampus(campusName);
+    }
 
     const renderChart = (campusName: string, lineColor?: string) => {
         const borderColor = lineColor || "#3b82f6"; // default blue
@@ -67,8 +69,8 @@ export default function ChartGroup({
 
         return (
             <div
-            className={`chart-card ${selectedCampus === campusName ? "selected" : ""}`}
-            onClick={() => setSelectedCampus(campusName)}
+            className={`chart-card ${campus === campusName ? "selected" : ""}`}
+            onClick={() => handleCampusClick(campusName)}
             style={{
                 "--border-color": borderColor,
                 "--glow-hover-color": glowColor,
@@ -122,14 +124,14 @@ export default function ChartGroup({
                         className="pt-1"
                     />
                 </div> */}
-                <div className="col-start-1 col-span-3">{renderChart(Campus.Manoa)}</div>
-                <div className="col-start-4 col-span-3">{renderChart(Campus.Hilo, "#008001")}</div>
-                <div className="col-start-7 col-span-3">{renderChart(Campus.WestOahu, "#800080")}</div>
+                <div className="col-start-1 col-span-3">{renderChart(Campus.Manoa, "#049c6cff")}</div>
+                <div className="col-start-4 col-span-3">{renderChart(Campus.Hilo, "#A32015")}</div>
+                <div className="col-start-7 col-span-3">{renderChart(Campus.WestOahu, "#A71930")}</div>
             </div>
             <div className="row-start-2 row-span-2 col-span-10 grid grid-cols-subgrid">
                 <SankeyAndDonutSyncProvider>
-                    <Donut data={filteredData} />
-                    <Sankey data={filteredData} className="col-start-6 col-span-5 bg-white border border-neutral-2 rounded-[50px] p-4 m-4" />
+                    <Donut data={filteredData} campus={campus}/>
+                    <Sankey data={filteredData} campus={campus} className="col-start-6 col-span-5 bg-white border border-neutral-2 rounded-[50px] p-4 m-4" />
                 </SankeyAndDonutSyncProvider>
             </div>
         </div>
