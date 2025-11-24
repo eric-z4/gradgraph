@@ -6,6 +6,11 @@ import { useEffect, useRef } from "react";
 import { useSankeyAndDonutSync } from "../SankeyAndDonutSync";
 
 function sankeyDataProcess(data) {
+    // Return empty structure if no data
+    if (!data || data.length === 0) {
+        return { nodes: [], links: [] };
+    }
+    
     //GROUPING
     const group1 = [...new Set(data.map(item => item.GROUP1))];
     const group2 = [...new Set(data.map(item => item.GROUP2))];
@@ -65,9 +70,12 @@ function sankeyDataProcess(data) {
     let tempColorsArr = [];
 
     let tempGroup1ColorArr = [];
-    for (let j = 0; j < degreeDataByGroup[0].length; j++) {
-        let tempColor = d3.hsl(360 * (j / degreeDataByGroup[0].length), 1.0, 0.65);
-        tempGroup1ColorArr.push(d3.rgb(tempColor).toString());
+
+    if (degreeDataByGroup.length > 0 && degreeDataByGroup[0].length > 0) {  // Check to prevent division by zero
+        for (let j = 0; j < degreeDataByGroup[0].length; j++) {
+            let tempColor = d3.hsl(360 * (j / degreeDataByGroup[0].length), 1.0, 0.65);
+            tempGroup1ColorArr.push(d3.rgb(tempColor).toString());
+        }
     }
     tempColorsArr.push(tempGroup1ColorArr);
 

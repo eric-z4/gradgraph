@@ -16,8 +16,8 @@ export default function InfoBox({
                 return "Founded in 1907, the University of Hawaiʻi at Mānoa is a destination of choice for students and faculty from across the nation and the world. UH Mānoa offers unique research opportunities, a diverse community, a nationally-ranked Division I athletics program and much more.";
             case "UH Hilo":
                 return "The University of Hawaiʻi at Hilo (UH Hilo) is a public university in Hilo, Hawaiʻi, United States. It was founded as Hilo Center at Lyman Hall of the Hilo Boys School in 1945 and was a branch campus of the University of Hawaiʻi at Mānoa. In 1970 it was reorganized by an act of the Hawaiʻi State Legislature and became a campus within the newly created University of Hawaiʻi System.";
-            case "UH West O`ahu":
-                return "It is part of the University of Hawaiʻi system. It offers baccalaureate degrees in liberal arts and professional studies. ";
+            case "UH West Oʻahu":
+                return "The University of Hawaiʻi–West Oʻahu is a public university in Kapolei, Hawaiʻi. As part of the University of Hawaiʻi system, UH West Oʻahu offers baccalaureate and graduate degrees in liberal arts and professional studies, serving the leeward coast and central Oʻahu communities.";
             default:
                 return "Select a campus to view detailed information about its degree distribution.";
         }
@@ -35,8 +35,8 @@ export default function InfoBox({
 
     return (
         <div className={`${className} relative`}>
-            <div className={`bg-white border border-neutral-2 rounded-4xl p-4 overflow-auto transition-opacity duration-300 ${showInfoCard ? 'opacity-50' : 'opacity-100'}`}>
-                <h1 className="text-5xl font-semibold pb-4">
+            <div className={`bg-white border border-neutral-2 rounded-4xl p-4 overflow-auto transition-all duration-300 ${showInfoCard ? 'blur-xs' : 'blur-none'}`}>
+                <h1 className="text-5xl font-semibold pb-2">
                     GradGraph
                     <button 
                         type="button" 
@@ -47,10 +47,17 @@ export default function InfoBox({
                         <BsInfoCircle className="w-5 h-5 ml-2 text-neutral-2 hover:text-primary-2 transition-colors"/>
                     </button>
                 </h1>
+                <h2 className="pb-2 text-base text-neutral-2/80">
+                    <em>Visualizing the degrees awarded across the University of Hawai‘i system</em>
+                </h2>
                 <hr className="border-t border-neutral-2/30"></hr>
-                <p className="pt-3 text-left">
-                    {infoText}
-                </p>
+                <div className="pt-3">
+                    <div className="inline-block px-3 py-1 bg-primary-2/10 text-primary-2 rounded-full text-sm mb-3">
+                        Exploring {campus}
+                    </div>
+                    {/* Campus-specific dataviz may go here? Can change the structure if need be */}
+                    <p className="text-base text-neutral-2/90 leading-relaxed">{infoText}</p>
+                </div>
             </div>
 
             {showInfoCard && (
@@ -78,6 +85,7 @@ export default function InfoBox({
                             <p className="text-body leading-relaxed">
                                 GradGraph allows you to look at the degrees awarded across the three main University of Hawaii campuses: UH Manoa, UH Hilo, and UH West Oahu. You can explore the distribution of degrees across various colleges and see the trends over different fiscal years.
                             </p>
+                            <p>Click on a line chart to view information for that campus.</p>
                             <p className="text-sm text-neutral-2 pt-2 border-t border-neutral-2/20">
                                 Created by <a href="https://github.com/eric-z4" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-600 transition-colors">Eric Zhou</a>, <a href="https://github.com/jpinera" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-600 transition-colors">Jaren Pinera</a>, and <a href="https://github.com/usradam" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-600 transition-colors">Adam Graham</a>
                             </p>
