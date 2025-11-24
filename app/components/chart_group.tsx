@@ -52,7 +52,7 @@ export default function ChartGroup({
         Y2025 = "Fiscal Year 2025",
     };
 
-    const [campus, setCampus] = useState<string>(Campus.Manoa);
+    const [campus, setCampus] = useState(Campus.Manoa as string);
     const [year, setYear] = useState(Year.Y2025);
     const filteredData = rawDegreeData.filter(item => item.CAMPUS == campus && item.FISCAL_YEAR == year);
 
