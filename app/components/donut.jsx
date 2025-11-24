@@ -147,8 +147,12 @@ export default function Donut({ data, campus, className="" }) {
             itemStyle: {
               shadowBlur: 10,
               shadowOffsetX: 0,
-              shadowColor: "rgba(0, 0, 0, 0.5)"
+              shadowColor: "rgba(0, 0, 0, 0.5)",
             }
+          },
+          itemStyle: {
+            borderColor: "rgb(20, 20, 20)",
+            borderWidth: 0.5
           }
         }
       ]

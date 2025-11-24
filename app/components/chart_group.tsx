@@ -100,7 +100,7 @@ export default function ChartGroup({
             </div>
             <div className="bg-white col-span-7 grid grid-cols-10 grid-rows-3">
                 <div className="grid grid-cols-9 row-start-1 col-span-10">
-                    <div className="col-start-1 col-span-3">{renderChart(Campus.Manoa, "#049c6cff")}</div>
+                    <div className="col-start-1 col-span-3">{renderChart(Campus.Manoa, "#024731")}</div>
                     <div className="col-start-4 col-span-3">{renderChart(Campus.Hilo, "#A32015")}</div>
                     <div className="col-start-7 col-span-3">{renderChart(Campus.WestOahu, "#A71930")}</div>
                 </div>
