@@ -90,7 +90,7 @@ export default function ChartGroup({
 
     /*
     * TODO
-    * - Utilize useState to change and select campus and year?
+    * - Utilize useState to change and select year?
     */
 
     return (

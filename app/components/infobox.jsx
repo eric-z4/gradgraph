@@ -40,11 +40,11 @@ export default function InfoBox({
                     GradGraph
                     <button 
                         type="button" 
-                        className="flex-shrink-0 p-1.5 rounded-full hover:bg-neutral-1/10 transition-all cursor-pointer hover:scale-110"
+                        className="flex-shrink-0 p-1.5 ml-2 rounded-full hover:bg-neutral-1/10 transition-all cursor-pointer hover:scale-110"
                         onClick={() => setShowInfoCard(true)}
                         aria-label="Learn more about GradGraph"
                     >
-                        <BsInfoCircle className="w-5 h-5 ml-2 text-neutral-1 hover:text-primary-2 transition-colors"/>
+                        <BsInfoCircle className="w-5 h-5 text-neutral-1 hover:text-highlight-1"/>
                     </button>
                 </h1>
                 <h2 className="pb-2 text-base text-neutral-1/80">
@@ -75,7 +75,7 @@ export default function InfoBox({
                             </h2>
                             <button 
                                 onClick={() => setShowInfoCard(false)}
-                                className="cursor-pointer transition-all hover:scale-125"
+                                className="cursor-pointer transition-all hover:scale-110"
                                 aria-label="Close"
                             >
                                 <BsX className="w-7 h-7 mt-1 text-neutral-2 hover:text-heading transition-colors"/>
