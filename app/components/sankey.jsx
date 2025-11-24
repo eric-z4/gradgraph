@@ -256,7 +256,7 @@ export default function Sankey({
             chart?.dispose();
             window.removeEventListener("resize", handleResize);
         };
-    }, [setHoveredCollege]);
+    }, [setHoveredCollege, campus]);
 
     // Handle hover from donut chart
     useEffect(() => {
