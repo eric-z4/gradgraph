@@ -93,10 +93,23 @@ export default function ChartGroup({
     * - Utilize useState to change and select year?
     */
 
+    const getCampusColor = (campusName: string) => {
+        switch(campusName) {
+            case Campus.Manoa:
+                return "#024731";
+            case Campus.Hilo:
+                return "#A32015";
+            case Campus.WestOahu:
+                return "#A71930";
+            default:
+                return "#024731";
+        }
+    };
+
     return (
         <div className="grid grid-cols-10 grid-row-1 h-screen">
             <div className="bg-white col-span-3">
-                <InfoBox campus={campus} className="text-center flex h-screen px-4" />
+                <InfoBox campus={campus} color={getCampusColor(campus)} className="text-center flex h-screen px-4" />
             </div>
             <div className="bg-white col-span-7 grid grid-cols-10 grid-rows-3">
                 <div className="grid grid-cols-9 row-start-1 col-span-10">

@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
     title: "GradGraph",
-    description: "GradGraph - Visualizing UH-system student degree data.",
+    description: "GradGraph - Visualizing the degrees awarded across the University of Hawai‘i system",
     icons: {
         icon: "/favicon.ico",
     },

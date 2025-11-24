@@ -6,7 +6,8 @@ import './infobox.css';
 
 export default function InfoBox({
     campus = "UH Manoa",
-    className = ""
+    className = "",
+    color = "#024731"
 })
 {
     const [showInfoCard, setShowInfoCard] = useState(false);
@@ -35,7 +36,10 @@ export default function InfoBox({
 
     return (
         <div className={`${className} relative`}>
-            <div className={`bg-primary-1 border border-neutral-2 py-8 px-4 overflow-auto transition-all duration-300 ${showInfoCard ? 'blur-xs' : 'blur-none'}`}>
+            <div 
+                className={`border border-neutral-2 py-8 px-4 overflow-auto transition-all duration-300 ${showInfoCard ? 'blur-xs' : 'blur-none'}`}
+                style={{ backgroundColor: color }}
+            >
                 <h1 className="text-5xl font-semibold pb-2 text-neutral-1">
                     GradGraph
                     <button 
@@ -44,7 +48,7 @@ export default function InfoBox({
                         onClick={() => setShowInfoCard(true)}
                         aria-label="Learn more about GradGraph"
                     >
-                        <BsInfoCircle className="w-5 h-5 text-neutral-1 hover:text-highlight-1"/>
+                        <BsInfoCircle className="w-5 h-5 text-neutral-1"/>
                     </button>
                 </h1>
                 <h2 className="pb-2 text-base text-neutral-1/80">
@@ -52,11 +56,14 @@ export default function InfoBox({
                 </h2>
                 <hr className="border-t border-neutral-1/30"></hr>
                 <div className="pt-3">
-                    <div className="inline-block px-3 py-1 bg-neutral-1/10 text-highlight-1 rounded-full text-sm mb-3">
+                    <div 
+                        className="inline-block px-3 py-1 rounded-full text-sm mb-3"
+                        style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)', color: '#ffffff' }}
+                    >
                         Exploring {campus}
                     </div>
                     {/* Campus-specific dataviz may go here? Can change the structure if need be */}
-                    <p className="text-base text-neutral-1/90 leading-relaxed">{infoText}</p>
+                    <p className="text-base text-neutral-1 leading-relaxed">{infoText}</p>
                 </div>
             </div>
 
