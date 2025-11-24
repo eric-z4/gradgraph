@@ -4,6 +4,7 @@ import { useState } from "react";
 import Sankey from "./sankey";
 import LineChartSchoolTrends from "./line-chart-school-trends";
 import Donut from "./donut";
+import InfoBox from "./infobox";
 import { SankeyAndDonutSyncProvider } from "../SankeyAndDonutSync";
 
 interface DataColumns
@@ -57,7 +58,7 @@ export default function ChartGroup({
     const [year, setYear] = useState(Year.Y2025);
     const filteredData = rawDegreeData.filter(item => item.CAMPUS == campus && item.FISCAL_YEAR == year);
 
-    // Interactive chart selection: tracking selected linechart for emphasis
+    // Line chart selection
     const handleCampusClick = (campusName: string) => {
         setCampus(campusName);
     }
@@ -95,44 +96,22 @@ export default function ChartGroup({
     */
 
     return (
-        <div className={className}>
-            {/* Row with 3 line charts */}
-            <div className="grid grid-cols-9 row-start-1 col-span-10">
-                {/* <div className="col-start-1 col-span-3 bg-white rounded-[25px] h-[270px] px-3 py-2 m-4 text-center">
-                    <span className="font-bold">UH Manoa</span> 
-                    <LineChartSchoolTrends 
-                        rawDegreeData={rawDegreeData} 
-                        campus={campus}
-                        className="pt-1"
-                    />
-                </div>
-                <div className="col-start-4 col-span-3 bg-white rounded-[25px] h-[270px] px-3 py-2 m-4 text-center">
-                    <span className="font-bold">UH Hilo</span> 
-                    <LineChartSchoolTrends 
-                        rawDegreeData={rawDegreeData} 
-                        campus={Campus.Hilo} 
-                        lineColor="green"
-                        className="pt-1"
-                    />
-                </div>
-                <div className="col-start-7 col-span-3 bg-white rounded-[25px] h-[270px] px-3 py-2 m-4 text-center">
-                    <span className="font-bold">UH West Oahu</span> 
-                    <LineChartSchoolTrends 
-                        rawDegreeData={rawDegreeData} 
-                        campus={Campus.WestOahu} 
-                        lineColor="purple"
-                        className="pt-1"
-                    />
-                </div> */}
-                <div className="col-start-1 col-span-3">{renderChart(Campus.Manoa, "#049c6cff")}</div>
-                <div className="col-start-4 col-span-3">{renderChart(Campus.Hilo, "#A32015")}</div>
-                <div className="col-start-7 col-span-3">{renderChart(Campus.WestOahu, "#A71930")}</div>
+        <div className="grid grid-cols-10 grid-row-1 h-screen">
+            <div className="bg-primary-1 col-span-3">
+                <InfoBox campus={campus} className="text-center flex h-screen p-4" />
             </div>
-            <div className="row-start-2 row-span-2 col-span-10 grid grid-cols-subgrid">
-                <SankeyAndDonutSyncProvider>
-                    <Donut data={filteredData} campus={campus}/>
-                    <Sankey data={filteredData} campus={campus} className="col-start-6 col-span-5 bg-white border border-neutral-2 rounded-[50px] p-4 m-4" />
-                </SankeyAndDonutSyncProvider>
+            <div className={className}>
+                <div className="grid grid-cols-9 row-start-1 col-span-10">
+                    <div className="col-start-1 col-span-3">{renderChart(Campus.Manoa, "#049c6cff")}</div>
+                    <div className="col-start-4 col-span-3">{renderChart(Campus.Hilo, "#A32015")}</div>
+                    <div className="col-start-7 col-span-3">{renderChart(Campus.WestOahu, "#A71930")}</div>
+                </div>
+                <div className="row-start-2 row-span-2 col-span-10 grid grid-cols-subgrid">
+                    <SankeyAndDonutSyncProvider>
+                        <Donut data={filteredData} campus={campus}/>
+                        <Sankey data={filteredData} campus={campus} className="col-start-6 col-span-5 bg-white border border-neutral-2 rounded-[50px] p-4 m-4" />
+                    </SankeyAndDonutSyncProvider>
+                </div>
             </div>
         </div>
     );

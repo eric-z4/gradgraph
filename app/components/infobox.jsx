@@ -5,11 +5,24 @@ import { BsInfoCircle, BsX } from 'react-icons/bs';
 import './infobox.css';
 
 export default function InfoBox({
+    campus = "UH Manoa",
     className = ""
 })
 {
     const [showInfoCard, setShowInfoCard] = useState(false);
-    const infoText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum ut enim ut odio maximus tempor sed sed mi. Curabitur quis tortor sed ex placerat posuere. Donec ipsum ipsum, fringilla non pellentesque in, scelerisque quis lacus. Integer aliquam sem elit, a mattis nibh porta id. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Aliquam et maximus velit. In ut urna urna. Nulla eu molestie dui, sed molestie dui. Aenean nisi urna, luctus eu pulvinar vitae, malesuada a arcu.Aliquam erat volutpat.In id laoreet arcu.Proin eget velit massa.Interdum et malesuada fames ac ante ipsum primis in faucibus.Maecenas augue augue, sollicitudin nec aliquet id, iaculis quis odio.In semper justo felis, ac tristique tellus condimentum eget.Duis feugiat risus ipsum, id vehicula nulla ultricies non.Sed iaculis, justo ut elementum suscipit, enim tortor efficitur diam, ac fermentum diam lectus sed ipsum.Pellentesque nec ornare dolor, at suscipit turpis.Nullam commodo ornare metus eget vehicula.Etiam eget est id nulla auctor consequat et at sapien.";
+    const getInfoText = (campusName) => {
+        switch(campusName) {
+            case "UH Manoa":
+                return "Founded in 1907, the University of Hawaiʻi at Mānoa is a destination of choice for students and faculty from across the nation and the world. UH Mānoa offers unique research opportunities, a diverse community, a nationally-ranked Division I athletics program and much more.";
+            case "UH Hilo":
+                return "The University of Hawaiʻi at Hilo (UH Hilo) is a public university in Hilo, Hawaiʻi, United States. It was founded as Hilo Center at Lyman Hall of the Hilo Boys School in 1945 and was a branch campus of the University of Hawaiʻi at Mānoa. In 1970 it was reorganized by an act of the Hawaiʻi State Legislature and became a campus within the newly created University of Hawaiʻi System.";
+            case "UH West O`ahu":
+                return "It is part of the University of Hawaiʻi system. It offers baccalaureate degrees in liberal arts and professional studies. ";
+            default:
+                return "Select a campus to view detailed information about its degree distribution.";
+        }
+    };
+    const infoText = getInfoText(campus);
 
     /*
     * - Have text be changeable (Text as useState)
