@@ -23,11 +23,9 @@ interface DataColumns
 }
 
 export default function ChartGroup({
-    rawDegreeData,
-    className = ""
+    rawDegreeData
 }: Readonly<{
-    rawDegreeData: Array<DataColumns>,
-    className: string
+    rawDegreeData: Array<DataColumns>
 }>) {
     const enum Campus {
         Manoa = "UH Manoa",
@@ -97,10 +95,10 @@ export default function ChartGroup({
 
     return (
         <div className="grid grid-cols-10 grid-row-1 h-screen">
-            <div className="bg-primary-1 col-span-3">
-                <InfoBox campus={campus} className="text-center flex h-screen p-4" />
+            <div className="bg-white col-span-3">
+                <InfoBox campus={campus} className="text-center flex h-screen px-4" />
             </div>
-            <div className={className}>
+            <div className="bg-white col-span-7 grid grid-cols-10 grid-rows-3">
                 <div className="grid grid-cols-9 row-start-1 col-span-10">
                     <div className="col-start-1 col-span-3">{renderChart(Campus.Manoa, "#049c6cff")}</div>
                     <div className="col-start-4 col-span-3">{renderChart(Campus.Hilo, "#A32015")}</div>
@@ -108,8 +106,8 @@ export default function ChartGroup({
                 </div>
                 <div className="row-start-2 row-span-2 col-span-10 grid grid-cols-subgrid">
                     <SankeyAndDonutSyncProvider>
-                        <Donut data={filteredData} campus={campus}/>
-                        <Sankey data={filteredData} campus={campus} className="col-start-6 col-span-5 bg-white border border-neutral-2 rounded-[50px] p-4 m-4" />
+                        <Donut data={filteredData} campus={campus} className="col-start-1 col-span-5 bg-white border-2 border-neutral-2 rounded-[50px] p-2 m-4 flex items-center justify-center" />
+                        <Sankey data={filteredData} campus={campus} className="col-start-6 col-span-5 bg-white border-2 border-neutral-2 rounded-[50px] p-4 m-4" />
                     </SankeyAndDonutSyncProvider>
                 </div>
             </div>

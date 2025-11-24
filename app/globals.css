@@ -1,13 +1,21 @@
 @import "tailwindcss";
 
 @theme {
+    /* 1.Green 2.Blue 3.Red from slightly dark to light */
     --color-primary-1: #024731;
     --color-primary-2: #022647;
-    /*--color-primary-3: #a71930;
-    --color-highlight-1: #b3995d;*/
+    --color-primary-3: #a71930;
+    --color-secondary-1: #0e7353;
+    --color-secondary-2: #0b7de6;
+    --color-secondary-3: #ed4e68;
+    --color-highlight-1: #b3995d; /* Gold color found on UH websites */
+    --color-highlight-2: #66b6ff;
+    --color-highlight-3: #ff94a5;
+    /* Basically white-ish to black-ish (faintly blue)*/
     --color-neutral-1: #f0f7ff;
     --color-neutral-2: #3c4544;
     --color-neutral-3: #212529;
+    --color-neutral-4: #111112;
 }
 
 /* Hover animation effect for charts */
@@ -18,6 +26,7 @@
   --glow-selected-color: rgba(96, 165, 250, 0.7);
 
   transition: transform 0.2s ease, border 0.2s ease, box-shadow 0.2s ease;
+  border: 2px solid var(--border-color); 
   border-radius: 25px;
   background-color: white;
   height: 275px;

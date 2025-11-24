@@ -26,6 +26,6 @@ export default async function Page() {
     */
     
     return (
-        <ChartGroup rawDegreeData={rawDegreeData} className="bg-primary-1 col-span-7 grid grid-cols-10 grid-rows-3" />
+        <ChartGroup rawDegreeData={rawDegreeData} />
     );
 }

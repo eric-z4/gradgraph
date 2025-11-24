@@ -35,8 +35,8 @@ export default function InfoBox({
 
     return (
         <div className={`${className} relative`}>
-            <div className={`bg-white border border-neutral-2 rounded-4xl p-4 overflow-auto transition-all duration-300 ${showInfoCard ? 'blur-xs' : 'blur-none'}`}>
-                <h1 className="text-5xl font-semibold pb-2">
+            <div className={`bg-primary-1 border border-neutral-2 py-8 px-4 overflow-auto transition-all duration-300 ${showInfoCard ? 'blur-xs' : 'blur-none'}`}>
+                <h1 className="text-5xl font-semibold pb-2 text-neutral-1">
                     GradGraph
                     <button 
                         type="button" 
@@ -44,19 +44,19 @@ export default function InfoBox({
                         onClick={() => setShowInfoCard(true)}
                         aria-label="Learn more about GradGraph"
                     >
-                        <BsInfoCircle className="w-5 h-5 ml-2 text-neutral-2 hover:text-primary-2 transition-colors"/>
+                        <BsInfoCircle className="w-5 h-5 ml-2 text-neutral-1 hover:text-primary-2 transition-colors"/>
                     </button>
                 </h1>
-                <h2 className="pb-2 text-base text-neutral-2/80">
+                <h2 className="pb-2 text-base text-neutral-1/80">
                     <em>Visualizing the degrees awarded across the University of Hawai‘i system</em>
                 </h2>
-                <hr className="border-t border-neutral-2/30"></hr>
+                <hr className="border-t border-neutral-1/30"></hr>
                 <div className="pt-3">
-                    <div className="inline-block px-3 py-1 bg-primary-2/10 text-primary-2 rounded-full text-sm mb-3">
+                    <div className="inline-block px-3 py-1 bg-neutral-1/10 text-highlight-1 rounded-full text-sm mb-3">
                         Exploring {campus}
                     </div>
                     {/* Campus-specific dataviz may go here? Can change the structure if need be */}
-                    <p className="text-base text-neutral-2/90 leading-relaxed">{infoText}</p>
+                    <p className="text-base text-neutral-1/90 leading-relaxed">{infoText}</p>
                 </div>
             </div>
 

@@ -46,7 +46,7 @@ function donutDataProcess(data) {
     };
 }
 
-export default function Donut({ data, campus }) {
+export default function Donut({ data, campus, className="" }) {
   const chartRef = useRef(null);
   const chartInstance = useRef(null);
   const { hoveredCollege, setHoveredCollege } = useSankeyAndDonutSync();
@@ -156,8 +156,8 @@ export default function Donut({ data, campus }) {
       chartInstance.current.setOption(option);
   }, [data, campus]);
 
-  return (
-      <div className="col-start-1 col-span-5 bg-white border border-neutral-2 rounded-[50px] p-2 m-4 flex items-center justify-center">
+    return (
+        <div className={className}>
       <div
         ref={chartRef}
         style={{ width: "95%", height: "95%" }}
