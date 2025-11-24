@@ -269,17 +269,11 @@ export default function Sankey({
                 seriesIndex: 0,
                 dataIndex: hoveredCollege + 1,
             });
-            chartInstance.current.dispatchAction({
-                type: "showTip",
-                seriesIndex: 0,
-                dataIndex: hoveredCollege + 1,
-            });
         } else {
             chartInstance.current.dispatchAction({
                 type: "downplay",
                 seriesIndex: 0,
             });
-            chartInstance.current.dispatchAction({ type: "hideTip" });
         }
     }, [hoveredCollege]);
 
