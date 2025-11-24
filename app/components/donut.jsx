@@ -109,10 +109,10 @@ export default function Donut({ data, campus }) {
             left: "center",
         top: 0,
         textStyle: {
-          fontSize: 14
+          fontSize: 16
         },
         subtextStyle: {
-          fontSize: 12
+          fontSize: 14
         }
       },
       tooltip: {
@@ -125,7 +125,7 @@ export default function Donut({ data, campus }) {
         bottom: 0,
         data: legendData,
         textStyle: {
-          fontSize: 10
+          fontSize: 12
         },
         itemGap: 6,
         itemWidth: 10,
@@ -140,7 +140,7 @@ export default function Donut({ data, campus }) {
           center: ["50%", "45%"], // [horizontal, vertical]
           data: seriesData,
           label: {
-            fontSize: 10,
+            fontSize: 11,
             distance: 5
           },
           emphasis: {

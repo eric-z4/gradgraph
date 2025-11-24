@@ -151,10 +151,10 @@ export default function Sankey({
                 text: `${campus} Degrees Awarded Breakdown`,
                 top: 0,
                 textStyle: {
-                    fontSize: 14
+                    fontSize: 16
                 },
                 subtextStyle: {
-                    fontSize: 12
+                    fontSize: 14
                 }
             },
             backgroundColor: "rgba(0, 0, 0, 0)",
