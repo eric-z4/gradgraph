@@ -195,7 +195,7 @@ export default function LineChartSchoolTrends({
               x1: vlineX,
               y0: 0,
               y1: yAxisMax,
-              line: { color: "rgba(248, 85, 85, 0.8)", width: 6 },
+              line: { color: "rgba(248, 85, 85, 0.8)", width: 4 },
               layer: "below",
               editable: isActive,
             },

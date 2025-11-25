@@ -6,6 +6,7 @@ import './infobox.css';
 
 export default function InfoBox({
     campus = "UH Manoa",
+    year = "FY 2025",
     className = "",
     color = "#024731"
 })
@@ -33,6 +34,7 @@ export default function InfoBox({
     *     - Major percentage explanation?
     *     - Breakdown of major by gender? and undergrad/grad degree
     */
+    const yearNumber = year ? year.replace(/[^\d]/g, '') : '2025';
 
     return (
         <div className={`${className} relative`}>
@@ -60,7 +62,7 @@ export default function InfoBox({
                         className="inline-block px-3 py-1 rounded-full text-sm mb-3"
                         style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)', color: '#ffffff' }}
                     >
-                        Exploring {campus}
+                        {campus} FY {yearNumber}
                     </div>
                     {/* Campus-specific dataviz may go here? Can change the structure if need be */}
                     <p className="text-base text-neutral-1 leading-relaxed">{infoText}</p>
