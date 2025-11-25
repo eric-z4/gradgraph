@@ -94,8 +94,10 @@ export default function InfoBox({
                             <p className="text-body leading-relaxed">
                                 GradGraph allows you to look at the degrees awarded across the three main University of Hawaii campuses: UH Manoa, UH Hilo, and UH West Oahu. You can explore the distribution of degrees across various colleges and see the trends over different fiscal years.
                             </p>
-                            <p>Click on a line chart to view information for that campus.</p>
+                            <p>Click on a line chart to view information for that campus. Once selected, you can click on a point on the graph or hold and drag the red line to a specific data point to explore a campus&apos; data for a given year. </p>
                             <p className="text-sm text-neutral-2 pt-2 border-t border-neutral-2/20">
+                                Data source: <a href="https://opendata.hawaii.gov/dataset/university-of-hawaii-student-degrees-awarded/resource/3a0b8368-71a7-4402-b9c7-9fc5a398a952" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-600 transition-colors">Hawaii Open Data</a>
+                                <br></br>
                                 Created by <a href="https://github.com/eric-z4" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-600 transition-colors">Eric Zhou</a>, <a href="https://github.com/jpinera" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-600 transition-colors">Jaren Pinera</a>, and <a href="https://github.com/usradam" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-600 transition-colors">Adam Graham</a>
                             </p>
                         </div>
