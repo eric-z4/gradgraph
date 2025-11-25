@@ -2,7 +2,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback, useRef } from "react";
 
 // Dynamically import Plotly with SSR disabled (avoids issues with server-side rendering)
 const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
@@ -26,6 +26,9 @@ interface LineChartProps {
   campus: string;
   lineColor?: string;
   className?: string;
+  selectedYear?: string;
+  onYearChange?: (year: string) => void;
+  isActive?: boolean;
 }
 
 export default function LineChartSchoolTrends({
@@ -33,6 +36,9 @@ export default function LineChartSchoolTrends({
   campus,
   lineColor = "rgb(29, 120, 180)",
   className = "",
+  selectedYear,
+  onYearChange,
+  isActive = false,
 }: LineChartProps) {
   // Memoize data to avoid unnecessary re-renders
   const { x, y, yMax } = useMemo(() => {
@@ -76,11 +82,28 @@ export default function LineChartSchoolTrends({
     }, [yMax]);
 
      // State for vertical line position
-    const [vlineX, setVlineX] = useState(x[Math.floor(x.length / 2)]);
+    // Initialize based on selectedYear if provided
+    const getInitialX = () => {
+      if (selectedYear) {
+        const yearNum = parseInt(selectedYear.replace(/[^\d]/g, ""), 10);
+        const index = x.indexOf(yearNum);
+        return index >= 0 ? x[index] : x[x.length - 1];
+      }
+      return x[x.length - 1];
+    };
 
-    const [markerY, setMarkerY] = useState(y[8]);
+    const [vlineX, setVlineX] = useState(getInitialX());
 
-    function snapToNearest(targetX: number) {
+    const getInitialY = () => {
+      const initialX = getInitialX();
+      const index = x.indexOf(initialX);
+      return index >= 0 ? y[index] : y[y.length - 1];
+    };
+
+    const [markerY, setMarkerY] = useState(getInitialY());
+    const lastNotifiedYear = useRef<number>(vlineX);
+
+    const snapToNearest = useCallback((targetX: number) => {
       let nearestIndex = 0;
       let minDist = Infinity;
 
@@ -93,7 +116,16 @@ export default function LineChartSchoolTrends({
       });
 
       return { x: x[nearestIndex], y: y[nearestIndex] };
-    }
+    }, [x, y]);
+
+    // Notify parent of year change only when it actually changes
+    const notifyYearChange = useCallback((yearX: number) => {
+      if (yearX !== lastNotifiedYear.current && onYearChange) {
+        lastNotifiedYear.current = yearX;
+        const fiscalYear = `Fiscal Year ${yearX}`;
+        onYearChange(fiscalYear);
+      }
+    }, [onYearChange]);
 
 
   return (
@@ -107,9 +139,12 @@ export default function LineChartSchoolTrends({
             mode: "lines+markers",
             line: { color: lineColor },
             showlegend: false,
+            name: "",
+            hovertemplate: isActive ? "Year: %{x}<br>Total Degrees: %{y}<extra></extra>" : "",
+            hoverinfo: isActive ? "text" : "skip",
           },
           {
-            // Vertical line as a scatter trace with 1 point
+            // Marker at slider position
             x: [vlineX],
             y: [markerY],
             type: "scatter",
@@ -119,13 +154,14 @@ export default function LineChartSchoolTrends({
               color: lineColor,
               line: { width: 2, color: "rgba(248, 85, 85, 1)" }
             },
-            hoverinfo: "skip",
+            hoverinfo: isActive ? "text" : "skip",
+            hovertext: `Year: ${vlineX}<br>Total Degrees: ${markerY}`,
             showlegend: false,
+            name: "",
           },
         ]}
         layout={{
-          // title: { text: `${campus}` },
-          dragmode: "x", // enables horizontal dragging of points
+          dragmode: false,
           height: 220,
           margin: { t: 10, r: 10, l: 50, b: 30 },
           automargin: true,
@@ -137,7 +173,8 @@ export default function LineChartSchoolTrends({
                 tickfont: { size: 10 },
                 tickmode: 'linear',
                 dtick: 3,             // interval of tickmarks
-                range: [2009.6, 2025.25] // adjust padding of x-axis for visual readability
+                range: [2009.6, 2025.25], // adjust padding of x-axis for visual readability
+                fixedrange: true // Disable zoom on x-axis
             },
           yaxis: {
                 title: {
@@ -147,31 +184,69 @@ export default function LineChartSchoolTrends({
                 tickfont: { size: 10 }, 
                 tickmode: 'linear',
                 dtick: yTick,
-                range: [0, yAxisMax]  // adjust padding of y-axis for visual readability
+                range: [0, yAxisMax],  // adjust padding of y-axis for visual readability
+                fixedrange: true // Disable zoom on y-axis
             },
           shapes: [
             {
+              // Visible line with wider hitbox
               type: "line",
               x0: vlineX,
               x1: vlineX,
               y0: 0,
               y1: yAxisMax,
-              line: { color: "rgba(248, 85, 85, 0.7)", width: 2 },
+              line: { color: "rgba(248, 85, 85, 0.8)", width: 6 },
               layer: "below",
+              editable: isActive,
             },
           ],
-          // This makes shapes draggable?
-          editable: true,
           hovermode: "closest",
         } as any}
+        config={{
+          displayModeBar: false, // Hide the toolbar
+          edits: {
+            shapePosition: isActive
+          }
+        }}
         style={{ width: "100%", height: "100%" }}
+        onClick={(data: any) => {
+          if (!isActive) return;
+          
+          // When clicking anywhere on the chart, always snap to nearest point
+          if (data.points && data.points.length > 0) {
+            const point = data.points[0];
+            const clickedX = point.x;
+            const snapped = snapToNearest(clickedX);
+            
+            setVlineX(snapped.x);
+            setMarkerY(snapped.y);
+            notifyYearChange(snapped.x);
+          }
+        }}
         onRelayout={(ev: any) => {
-          if (ev["shapes[0].x0"] !== undefined) {
+          // Only handle dragging when chart is active
+          if (isActive && ev["shapes[0].x0"] !== undefined) {
             const newX = ev["shapes[0].x0"];
             const snapped = snapToNearest(newX);
 
             setVlineX(snapped.x);
             setMarkerY(snapped.y);
+            notifyYearChange(snapped.x);
+          }
+        }}
+        onUpdate={(figure: any) => {
+          // Only handle continuous dragging when chart is active
+          if (isActive && figure.layout?.shapes?.[0]?.x0 !== undefined) {
+            const newX = figure.layout.shapes[0].x0;
+            const snapped = snapToNearest(newX);
+
+            // Only update if we've moved to a different point
+            if (snapped.x !== vlineX) {
+              // Update local state immediately for responsive UI
+              setVlineX(snapped.x);
+              setMarkerY(snapped.y);
+              notifyYearChange(snapped.x);
+            }
           }
         }}
       />

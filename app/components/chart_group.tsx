@@ -53,8 +53,17 @@ export default function ChartGroup({
     };
 
     const [campus, setCampus] = useState(Campus.Manoa as string);
-    const [year, setYear] = useState(Year.Y2025);
-    const filteredData = rawDegreeData.filter(item => item.CAMPUS == campus && item.FISCAL_YEAR == year);
+    
+    // Store year state per campus
+    const [years, setYears] = useState<Record<string, Year>>({
+        [Campus.Manoa]: Year.Y2025,
+        [Campus.Hilo]: Year.Y2025,
+        [Campus.WestOahu]: Year.Y2025,
+    });
+
+    // Get current year for selected campus
+    const currentYear = years[campus] || Year.Y2025;
+    const filteredData = rawDegreeData.filter(item => item.CAMPUS == campus && item.FISCAL_YEAR == currentYear);
 
     // Line chart selection
     const handleCampusClick = (campusName: string) => {
@@ -65,6 +74,16 @@ export default function ChartGroup({
         const borderColor = lineColor || "#3b82f6"; // default blue
         const glowColor = lineColor ? `${lineColor}FF` : "rgba(59, 130, 246, 0.5)"; 
         const glowSelectedColor = lineColor ? `${lineColor}FF` : "rgba(96, 165, 250, 0.7)"; 
+
+        // Handle year change with proper type
+        const handleYearChange = campus === campusName 
+            ? (yearString: string) => {
+                setYears(prev => ({
+                    ...prev,
+                    [campusName]: yearString as Year
+                }));
+              }
+            : undefined;
 
         return (
             <div
@@ -83,15 +102,13 @@ export default function ChartGroup({
                 campus={campusName}
                 lineColor={lineColor}
                 className="pt-1 pe-2"
+                selectedYear={years[campusName] || Year.Y2025}
+                onYearChange={handleYearChange}
+                isActive={campus === campusName}
             />
         </div>
         );
     };
-
-    /*
-    * TODO
-    * - Utilize useState to change and select year?
-    */
 
     const getCampusColor = (campusName: string) => {
         switch(campusName) {
@@ -119,7 +136,7 @@ export default function ChartGroup({
                 </div>
                 <div className="row-start-2 row-span-2 col-span-10 grid grid-cols-subgrid">
                     <SankeyAndDonutSyncProvider>
-                        <Donut data={filteredData} campus={campus} className="col-start-1 col-span-5 bg-white border-2 border-neutral-2 rounded-[50px] p-2 m-4 flex items-center justify-center" />
+                        <Donut data={filteredData} campus={campus} year={currentYear} className="col-start-1 col-span-5 bg-white border-2 border-neutral-2 rounded-[50px] p-2 m-4 flex items-center justify-center" />
                         <Sankey data={filteredData} campus={campus} className="col-start-6 col-span-5 bg-white border-2 border-neutral-2 rounded-[50px] p-4 m-4" />
                     </SankeyAndDonutSyncProvider>
                 </div>

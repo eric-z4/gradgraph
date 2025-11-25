@@ -46,10 +46,12 @@ function donutDataProcess(data) {
     };
 }
 
-export default function Donut({ data, campus, className="" }) {
+export default function Donut({ data, campus, year, className="" }) {
   const chartRef = useRef(null);
   const chartInstance = useRef(null);
   const { hoveredCollege, setHoveredCollege } = useSankeyAndDonutSync();
+
+  const yearNumber = year ? year.replace(/[^\d]/g, '') : '2025';
 
   useEffect(() => {
     if (!chartRef.current) return;
@@ -105,8 +107,8 @@ export default function Donut({ data, campus, className="" }) {
     const option = {
       title: {
         text: `${campus} Degrees Awarded`,
-        subtext: "Fiscal Year 2025",
-            left: "center",
+        subtext: `Fiscal Year ${yearNumber}`,
+        left: "center",
         top: 0,
         textStyle: {
           fontSize: 16
@@ -158,7 +160,7 @@ export default function Donut({ data, campus, className="" }) {
       ]
     };
       chartInstance.current.setOption(option);
-  }, [data, campus]);
+  }, [data, campus, year, yearNumber]);
 
     return (
         <div className={className}>
