@@ -5,7 +5,28 @@ import * as echarts from "echarts";
 import * as d3 from "d3";
 import { useSankeyAndDonutSync } from "../SankeyAndDonutSync";
 
-function donutDataProcess(data) {
+interface DataColumns {
+  FISCAL_YEAR: string;
+  CAMPUS: string;
+  CIP: string;
+  CIP_DESC: string;
+  GROUP1: string;
+  GROUP2: string;
+  GROUP3: string;
+  GROUP4: string;
+  GROUP5: string;
+  OUTCOME: string;
+  AWARDS: number;
+}
+
+interface DonutProps {
+  data: DataColumns[];
+  campus: string;
+  year: string;
+  className?: string;
+}
+
+function donutDataProcess(data: DataColumns[]) {
     if (!data || !Array.isArray(data)) {
         return { legendData: [], seriesData: [] };
     }
@@ -26,7 +47,7 @@ function donutDataProcess(data) {
         };
     }).sort((a, b) => b.value - a.value);
 
-    // Match D3 color scheme of Sankey chart
+    // Match D3 color scheme of the Sankey chart
     const colors = collegeData.map((_, i) => {
         const hslColor = d3.hsl(360 * (i / collegeData.length), 1.0, 0.65);
         return d3.rgb(hslColor).toString();
@@ -46,9 +67,9 @@ function donutDataProcess(data) {
     };
 }
 
-export default function Donut({ data, campus, year, className="" }) {
-  const chartRef = useRef(null);
-  const chartInstance = useRef(null);
+export default function Donut({ data, campus, year, className="" }: DonutProps) {
+  const chartRef = useRef<HTMLDivElement | null>(null);
+  const chartInstance = useRef<echarts.ECharts | null>(null);
   const { hoveredCollege, setHoveredCollege } = useSankeyAndDonutSync();
 
   const yearNumber = year ? year.replace(/[^\d]/g, '') : '2025';
@@ -59,7 +80,7 @@ export default function Donut({ data, campus, year, className="" }) {
     chartInstance.current = echarts.init(chartRef.current);
 
     chartInstance.current.on("mouseover", params => {
-      if (params.dataIndex != null) {
+      if (params.dataIndex != null && chartInstance.current) {
         // Downplay all slices first, then highlight the current one
         chartInstance.current.dispatchAction({
           type: "downplay",
