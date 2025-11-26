@@ -2,7 +2,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useMemo, useState, useCallback, useRef } from "react";
+import { useMemo, useState, useCallback, useRef, useEffect } from "react";
 
 // Dynamically import Plotly with SSR disabled (avoids issues with server-side rendering)
 const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
@@ -81,7 +81,7 @@ export default function LineChartSchoolTrends({
       };
     }, [yMax]);
 
-     // State for vertical line position
+    // State for vertical line position
     // Initialize based on selectedYear if provided
     const getInitialX = () => {
       if (selectedYear) {
@@ -102,6 +102,9 @@ export default function LineChartSchoolTrends({
 
     const [markerY, setMarkerY] = useState(getInitialY());
     const lastNotifiedYear = useRef<number>(vlineX);
+    const isDragging = useRef(false);
+    const recentDrag = useRef(false);
+    const containerRef = useRef<HTMLDivElement>(null);
 
     const snapToNearest = useCallback((targetX: number) => {
       let nearestIndex = 0;
@@ -127,24 +130,109 @@ export default function LineChartSchoolTrends({
       }
     }, [onYearChange]);
 
+    // Convert mouse position to data x-coordinate
+    const getDataXFromMouseEvent = useCallback((e: MouseEvent | React.MouseEvent) => {
+      if (!containerRef.current) return null;
+      const plotArea = containerRef.current.querySelector('.plotly') as HTMLElement;
+
+      if (!plotArea) return null;
+      const plotRect = plotArea.getBoundingClientRect();
+      const mouseX = e.clientX - plotRect.left;
+      const plotWidth = plotRect.width;
+      
+      // Approximate margins
+      const leftMargin = 40;
+      const rightMargin = 10;
+      const effectiveWidth = plotWidth - leftMargin - rightMargin;
+      
+      if (mouseX < leftMargin || mouseX > plotWidth - rightMargin) return null;
+      
+      // Map pixel position to data coordinate
+      const xRange = [2009.6, 2025.25];
+      const dataX = xRange[0] + ((mouseX - leftMargin) / effectiveWidth) * (xRange[1] - xRange[0]);
+      
+      return dataX;
+    }, []);
+
+    const handleMouseMove = useCallback((e: MouseEvent) => {
+      if (!isActive || !isDragging.current) return;
+
+      const dataX = getDataXFromMouseEvent(e);
+      if (dataX !== null) {
+        const snapped = snapToNearest(dataX);
+
+        if (snapped.x !== vlineX) {
+          setVlineX(snapped.x);
+          setMarkerY(snapped.y);
+          notifyYearChange(snapped.x);
+          recentDrag.current = true;
+        }
+      }
+    }, [isActive, getDataXFromMouseEvent, snapToNearest, vlineX, notifyYearChange]);
+
+    const handleMouseUp = useCallback(() => {
+      isDragging.current = false;
+      // Clear recentDrag shortly after mouseup so subsequent clicks are honored
+      setTimeout(() => {
+        recentDrag.current = false;
+      }, 100);
+    }, []);
+
+    useEffect(() => {
+      if (typeof window !== 'undefined') {
+        window.addEventListener('mousemove', handleMouseMove);
+        window.addEventListener('mouseup', handleMouseUp);
+        
+        return () => {
+          window.removeEventListener('mousemove', handleMouseMove);
+          window.removeEventListener('mouseup', handleMouseUp);
+        };
+      }
+    }, [handleMouseMove, handleMouseUp]);
 
   return (
-    <div className={className}>
+    <div 
+      ref={containerRef}
+      className={`${className} plot-container`}
+      onMouseDown={() => {
+        if (!isActive) return;
+        isDragging.current = true;
+      }}
+    >
       <Plot
         data={[
           {
             x,
             y,
             type: "scatter",
-            mode: "lines+markers",
+            mode: "lines",
             line: { color: lineColor },
+            showlegend: false,
+            name: "",
+            hoverinfo: "skip",
+          },
+          {
+            x: [vlineX, vlineX],
+            y: [0, yAxisMax],
+            type: "scatter",
+            mode: "lines",
+            line: { color: "rgba(248, 85, 85, 0.85)", width: 4 },
+            hoverinfo: "skip",
+            showlegend: false,
+            name: "",
+          },
+          { // Data markers rendered after the vertical line so markers appear on top
+            x,
+            y,
+            type: "scatter",
+            mode: "markers",
+            marker: { size: 6, color: lineColor, line: { width: 0 } },
             showlegend: false,
             name: "",
             hovertemplate: isActive ? "Year: %{x}<br>Total Degrees: %{y}<extra></extra>" : "",
             hoverinfo: isActive ? "text" : "skip",
           },
           {
-            // Marker at slider position
             x: [vlineX],
             y: [markerY],
             type: "scatter",
@@ -172,8 +260,8 @@ export default function LineChartSchoolTrends({
                 },
                 tickfont: { size: 10 },
                 tickmode: 'linear',
-                dtick: 3,             // interval of tickmarks
-                range: [2009.6, 2025.25], // adjust padding of x-axis for visual readability
+                dtick: 3,
+                range: [2009.6, 2025.25],
                 fixedrange: true // Disable zoom on x-axis
             },
           yaxis: {
@@ -184,167 +272,41 @@ export default function LineChartSchoolTrends({
                 tickfont: { size: 10 }, 
                 tickmode: 'linear',
                 dtick: yTick,
-                range: [0, yAxisMax],  // adjust padding of y-axis for visual readability
+                range: [0, yAxisMax],
                 fixedrange: true // Disable zoom on y-axis
             },
-          shapes: [
-            {
-              // Visible line with wider hitbox
-              type: "line",
-              x0: vlineX,
-              x1: vlineX,
-              y0: 0,
-              y1: yAxisMax,
-              line: { color: "rgba(248, 85, 85, 0.8)", width: 4 },
-              layer: "below",
-              editable: isActive,
-            },
-          ],
           hovermode: "closest",
+          showlegend: false,
         } as any}
         config={{
-          displayModeBar: false, // Hide the toolbar
+          displayModeBar: false,
           edits: {
-            shapePosition: isActive
+            shapePosition: false
           }
         }}
         style={{ width: "100%", height: "100%" }}
-        onClick={(data: any) => {
+        onClick={(evt: any) => {
           if (!isActive) return;
-          
-          // When clicking anywhere on the chart, always snap to nearest point
-          if (data.points && data.points.length > 0) {
-            const point = data.points[0];
-            const clickedX = point.x;
-            const snapped = snapToNearest(clickedX);
-            
+
+          // Ignore clicks that immediately follow a drag
+          if (recentDrag.current) return;
+          let snapped: { x: number; y: number } | null = null;
+
+          if (evt.points && evt.points.length > 0) {
+            const clickedX = evt.points[0].x;
+            snapped = snapToNearest(clickedX);
+          } else if (evt.event) {
+            const dataX = getDataXFromMouseEvent(evt.event as MouseEvent);
+            if (dataX !== null) snapped = snapToNearest(dataX);
+          }
+
+          if (snapped) {
             setVlineX(snapped.x);
             setMarkerY(snapped.y);
             notifyYearChange(snapped.x);
-          }
-        }}
-        onRelayout={(ev: any) => {
-          // Only handle dragging when chart is active
-          if (isActive && ev["shapes[0].x0"] !== undefined) {
-            const newX = ev["shapes[0].x0"];
-            const snapped = snapToNearest(newX);
-
-            setVlineX(snapped.x);
-            setMarkerY(snapped.y);
-            notifyYearChange(snapped.x);
-          }
-        }}
-        onUpdate={(figure: any) => {
-          // Only handle continuous dragging when chart is active
-          if (isActive && figure.layout?.shapes?.[0]?.x0 !== undefined) {
-            const newX = figure.layout.shapes[0].x0;
-            const snapped = snapToNearest(newX);
-
-            // Only update if we've moved to a different point
-            if (snapped.x !== vlineX) {
-              // Update local state immediately for responsive UI
-              setVlineX(snapped.x);
-              setMarkerY(snapped.y);
-              notifyYearChange(snapped.x);
-            }
           }
         }}
       />
     </div>
   );
 }
-
-
-// ChartJS implementation
-// import { Line } from "react-chartjs-2";
-// import {
-//     Chart as ChartJS,
-//     LineElement,
-//     PointElement,
-//     CategoryScale,
-//     LinearScale,
-//     Tooltip,
-//     Legend
-// } from "chart.js";
-// import { useMemo } from "react";
-
-// ChartJS.register(
-//     LineElement,
-//     PointElement,
-//     CategoryScale,
-//     LinearScale,
-//     Tooltip,
-//     Legend
-// );
-
-// interface DataColumns {
-//     FISCAL_YEAR: string;
-//     CAMPUS: string;
-//     CIP: string;
-//     CIP_DESC: string;
-//     GROUP1: string;
-//     GROUP2: string;
-//     GROUP3: string;
-//     GROUP4: string;
-//     GROUP5: string;
-//     OUTCOME: string;
-//     AWARDS: number;
-// }
-
-// export default function LineChartSchoolTrends({
-//     rawDegreeData,
-//     campus,
-//     className = ""
-// }: Readonly<{
-//     rawDegreeData: Array<DataColumns>;
-//     campus: string;
-//     className?: string;
-// }>) {
-
-//     // Aggregate campus totals by year
-//     const yearTotals = useMemo(() => {
-//         const totals: Record<string, number> = {};
-
-//         rawDegreeData
-//             .filter((row) => row.CAMPUS === campus)
-//             .forEach((row) => {
-//                 totals[row.FISCAL_YEAR] =
-//                     (totals[row.FISCAL_YEAR] || 0) + row.AWARDS;
-//             });
-
-//         return Object.entries(totals)
-//             .map(([year, total]) => ({ year, total }))
-//             .sort((a, b) => a.year.localeCompare(b.year));
-//     }, [rawDegreeData, campus]);
-
-//     const data = {
-//         labels: yearTotals.map((d) => d.year),
-//         datasets: [
-//             {
-//                 label: `${campus} – Total Graduates`,
-//                 data: yearTotals.map((d) => d.total),
-//                 borderColor: "rgb(53, 162, 235)",
-//                 backgroundColor: "rgba(53, 162, 235, 0.4)",
-//                 tension: 0.2
-//             }
-//         ]
-//     };
-
-//     const options = {
-//         responsive: true,
-//         maintainAspectRatio: false,
-//         scales: {
-//             y: {
-//                 beginAtZero: true
-//             }
-//         }
-//     };
-
-//     return (
-//         <div className={className}>
-//             <Line data={data} options={options} />
-//         </div>
-//     );
-// }
-
-
