@@ -48,24 +48,12 @@ function sankeyDataProcess(data) {
                 return 0;
             }
         });
-
-        // Use processed data of current group to create nodes and links
         currentGroup.forEach((item, j) => {
             // Generate color for first group (rest are inherited by parent)
             item.color = i > 1 ? prevGroup.filter(prvItem => prvItem.name === item.parent)[0].color :
                 d3.rgb(d3.hsl(360 * (j / currentGroup.length), 1.0, 0.65)).toString();
 
-            nodes.push({
-                name: item.name,
-                depth: j > 100 ? i + 1 : i,
-                parent_value: item.parent_degrees,
-                itemStyle: { color: item.color },
-                label: {
-                    formatter: (d) => {
-                        return d.name.slice(0, -1).length > 16 ? d.name.slice(0, -1).slice(0, 16) + "..." : d.name.slice(0, -1);
-                    }
-                }
-            });
+            // Use processed data to create links
             links.push({
                 source: item.parent,
                 target: item.name,
@@ -73,6 +61,29 @@ function sankeyDataProcess(data) {
                 parent_value: item.parent_degrees
             });
         });
+
+        // If previous group exceeded 100, create the nodes at current depth
+        let tempNodeGenGroup = currentGroup;
+        if (prevGroup.length > 100) {
+            tempNodeGenGroup = currentGroup.concat(prevGroup.slice(100));
+        }
+
+        // Use processed data of current group to create nodes
+        tempNodeGenGroup.forEach((item, k) => { 
+            if (k < 100) {
+                nodes.push({
+                    name: item.name,
+                    depth: i,
+                    parent_value: item.parent_degrees,
+                    itemStyle: { color: item.color },
+                    label: {
+                        formatter: (d) => {
+                            return d.name.slice(0, -1).length > 16 ? d.name.slice(0, -1).slice(0, 16) + "..." : d.name.slice(0, -1);
+                        }
+                    }
+                });
+            }
+        })
 
         prevGroup = currentGroup;
     }
