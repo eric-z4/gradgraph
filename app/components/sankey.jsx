@@ -10,48 +10,36 @@ function sankeyDataProcess(data) {
     if (!data || data.length === 0) {
         return { nodes: [], links: [] };
     }
-    
-    //GROUPING
-    const group1 = [...new Set(data.map(item => item.GROUP1))];
-    const group2 = [...new Set(data.map(item => item.GROUP2))];
-    const group3 = [...new Set(data.map(item => item.GROUP3))].filter(item => item != "");
-    const group4 = [...new Set(data.map(item => item.GROUP4))].filter(item => item != "");
-    const group5 = [...new Set(data.map(item => item.GROUP5))].filter(item => item != "");
-    const groupOrder = [group1, group2, group3, group4, group5];
-    const degreeDataByGroup = [];
+
     const totalDegrees = data.reduce((total, item) => total + parseInt(item.AWARDS), 0);
+    let nodes = [{
+        name: "Total ",
+        depth: 0,
+        parent_value: totalDegrees,
+        itemStyle: { color: "rgb(230, 230, 230)" },
+    }];
+    let links = [];
+    let prevGroup = [{ name: "Total ", degrees: totalDegrees }];
 
-    for (let i = groupOrder.length - 1; i >= 0; i--) {
-        let temp = [];
-        let tempLen = groupOrder[i].length;
+    for (let i = 1; i <= 5; i++) {
+        // Getting groups, "parent" groups, and degrees
+        const currentGroup = [...new Set(data.map(item => item["GROUP" + i]))]
+            .filter(item => item != "")
+            .map(groupRow => {
+                const dataRows = data.filter(item => item["GROUP" + i] === groupRow);
+                const tempObj = {
+                    name: groupRow + i,
+                    degrees: dataRows
+                        .reduce((total, item) => total + parseInt(item.AWARDS), 0),
+                    parent: i > 1 ? dataRows
+                        .map(item => item["GROUP" + (i - 1)])[0] + (i - 1) : "Total ",
+                };
+                tempObj.parent_degrees = prevGroup
+                    .filter(item => item.name === tempObj.parent)[0].degrees;
 
-        for (let j = 0; j < tempLen; j++) {
-            let tempName = groupOrder[i][j];
-            let tempCategory = [...new Set(data
-                .filter(item => item["GROUP" + (i + 1)] == tempName)
-                .map(item => item.CIP_DESC))];
-            let tempObj = {
-                name: groupOrder[i][j] + (i + 1),
-                degrees: data
-                    .filter(item => item["GROUP" + (i + 1)] == tempName)
-                    .reduce((total, item) => total + parseInt(item.AWARDS), 0),
-                parent: i != 0 ? data
-                    .filter(item => item["GROUP" + (i + 1)] == tempName)
-                    .map(item => item["GROUP" + i])[0] + i : "Total ",
-                parent_degrees: i != 0 ? data
-                    .filter(item => item["GROUP" + i] == data
-                        .filter(item => item["GROUP" + (i + 1)] == tempName)
-                        .map(item => item["GROUP" + i])[0])
-                    .reduce((total, item) => total + parseInt(item.AWARDS), 0) : totalDegrees,
-            };
-            if (tempCategory.length == 1) {
-                tempObj.category = tempCategory[0];
-            }
-
-            temp.push(tempObj);
-        }
-
-        temp.sort((a, b) => {
+                return tempObj;
+            });
+        currentGroup.sort((a, b) => {
             if (a.degrees < b.degrees) {
                 return 1;
             } else if (a.degrees > b.degrees) {
@@ -59,78 +47,37 @@ function sankeyDataProcess(data) {
             } else {
                 return 0;
             }
-        })
-
-        degreeDataByGroup.push(temp);
-    }
-
-    degreeDataByGroup.reverse();
-
-    //TURNING IT INTO NODES AND LINKS
-    let tempColorsArr = [];
-
-    let tempGroup1ColorArr = [];
-
-    if (degreeDataByGroup.length > 0 && degreeDataByGroup[0].length > 0) {  // Check to prevent division by zero
-        for (let j = 0; j < degreeDataByGroup[0].length; j++) {
-            let tempColor = d3.hsl(360 * (j / degreeDataByGroup[0].length), 1.0, 0.65);
-            tempGroup1ColorArr.push(d3.rgb(tempColor).toString());
-        }
-    }
-    tempColorsArr.push(tempGroup1ColorArr);
-
-    for (let i = 1; i < degreeDataByGroup.length; i++) {
-        let tempGroupColorArr = []
-        for (let j = 0; j < degreeDataByGroup[i].length; j++) {
-            let parentIndex = degreeDataByGroup[i - 1].findIndex(item => item.name == degreeDataByGroup[i][j].parent);
-            let tempColor = d3.hsl(tempColorsArr[i - 1][parentIndex]);
-            //let lightness = d3.interpolateNumber(0.1, 0.15)
-            //tempColor.l += lightness(j / degreeDataByGroup[i].length);
-            tempGroupColorArr.push(d3.rgb(tempColor).toString());
-        }
-        tempColorsArr.push(tempGroupColorArr)
-    }
-
-    let degreeGroupForNodes = [...degreeDataByGroup]
-    degreeGroupForNodes.reverse()
-        .forEach((group, i) => {
-            if (i > 1 && group.length > 100) {
-                degreeGroupForNodes[i - 2] = degreeGroupForNodes[i - 1];
-                degreeGroupForNodes[i - 1] = group.slice(100);
-                degreeGroupForNodes[i] = group.slice(0, 100);
-            }
         });
-    degreeGroupForNodes.reverse();
 
-    const nodes = [{
-        name: "Total ",
-        depth: 0,
-        parent_value: totalDegrees,
-        itemStyle: { color: "rgb(230, 230, 230)" },
-    }]
-        .concat(degreeGroupForNodes.flatMap((group, i) => group.map((item, j) => {
-            return {
+        // Use processed data of current group to create nodes and links
+        currentGroup.forEach((item, j) => {
+            // Generate color for first group (rest are inherited by parent)
+            item.color = i > 1 ? prevGroup.filter(prvItem => prvItem.name === item.parent)[0].color :
+                d3.rgb(d3.hsl(360 * (j / currentGroup.length), 1.0, 0.65)).toString();
+
+            nodes.push({
                 name: item.name,
-                depth: i + 1,
+                depth: j > 100 ? i + 1 : i,
                 parent_value: item.parent_degrees,
-                itemStyle: { color: tempColorsArr[i][j] },
+                itemStyle: { color: item.color },
                 label: {
                     formatter: (d) => {
                         return d.name.slice(0, -1).length > 16 ? d.name.slice(0, -1).slice(0, 16) + "..." : d.name.slice(0, -1);
                     }
-                },
-            }
-        })))
-    const links = degreeDataByGroup.flatMap((group, i) => group.map(item => {
-        return {
-            source: item.parent,
-            target: item.name,
-            value: item.degrees,
-            parent_value: item.parent_degrees
-        }
-    }))
+                }
+            });
+            links.push({
+                source: item.parent,
+                target: item.name,
+                value: item.degrees,
+                parent_value: item.parent_degrees
+            });
+        });
 
-    return { nodes, links }
+        prevGroup = currentGroup;
+    }
+
+    return { nodes, links };
 }
 
 /*
