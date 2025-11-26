@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Sankey from "./sankey";
-import LineChartSchoolTrends from "./line-chart-school-trends";
+import LineChartSchoolTrends from "./line_charts";
 import Donut from "./donut";
 import InfoBox from "./infobox";
 import { SankeyAndDonutSyncProvider } from "../SankeyAndDonutSync";

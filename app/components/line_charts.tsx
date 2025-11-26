@@ -285,18 +285,19 @@ export default function LineChartSchoolTrends({
           }
         }}
         style={{ width: "100%", height: "100%" }}
-        onClick={(evt: any) => {
+        onClick={(clickEvent: any) => {
           if (!isActive) return;
 
           // Ignore clicks that immediately follow a drag
           if (recentDrag.current) return;
           let snapped: { x: number; y: number } | null = null;
 
-          if (evt.points && evt.points.length > 0) {
-            const clickedX = evt.points[0].x;
+          if (clickEvent.points && clickEvent.points.length > 0) {
+            const clickedX = clickEvent.points[0].x;
             snapped = snapToNearest(clickedX);
-          } else if (evt.event) {
-            const dataX = getDataXFromMouseEvent(evt.event as MouseEvent);
+          }
+          else if (clickEvent.event) {
+            const dataX = getDataXFromMouseEvent(clickEvent.event as MouseEvent);
             if (dataX !== null) snapped = snapToNearest(dataX);
           }
 

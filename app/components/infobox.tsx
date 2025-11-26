@@ -2,17 +2,24 @@
 
 import { useState } from 'react';
 import { BsInfoCircle, BsX } from 'react-icons/bs';
-import './infobox.css';
+import '../css/infobox.css';
+
+interface InfoBoxProps {
+    campus?: string;
+    year?: string;
+    className?: string;
+    color?: string;
+}
 
 export default function InfoBox({
     campus = "UH Manoa",
     year = "FY 2025",
     className = "",
     color = "#024731"
-})
+}: InfoBoxProps)
 {
     const [showInfoCard, setShowInfoCard] = useState(false);
-    const getInfoText = (campusName) => {
+    const getInfoText = (campusName: string): string => {
         switch(campusName) {
             case "UH Manoa":
                 return "[UH Manoa data viz stuff goes here]";
