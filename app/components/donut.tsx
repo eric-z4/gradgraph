@@ -31,21 +31,20 @@ function donutDataProcess(data: DataColumns[]) {
         return { legendData: [], seriesData: [] };
     }
     
-    const colleges = Array.from(
-        new Set(data.map(d => d.GROUP1).filter(Boolean))
-    );
+  const totalAwards = {} as Record<string, number>;
 
-    // Calculate total awards for each college and sort by degree count (descending)
-    const collegeData = colleges.map(college => {
-        const totalAwards = data
-            .filter(d => d.GROUP1 === college)
-            .reduce((sum, d) => sum + Number(d.AWARDS || 0), 0);
-        
-        return {
-            name: college,
-            value: totalAwards
-        };
-    }).sort((a, b) => b.value - a.value);
+  for (const row of data) {
+    const college = row.GROUP1;
+    if (!college) continue;
+
+    const awards = Number(row.AWARDS || 0);
+    totalAwards[college] = (totalAwards[college] || 0) + awards;
+  }
+
+    // Create array of the dictionary objects and sort by value descending
+    const collegeData = Object.entries(totalAwards)
+        .map(([name, value]) => ({ name, value }))
+        .sort((a, b) => b.value - a.value);
 
     // Match D3 color scheme of the Sankey chart
     const colors = collegeData.map((_, i) => {

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Sankey from "./sankey";
-import LineChartSchoolTrends from "./line_charts";
+import LineCharts from "./line_charts";
 import Donut from "./donut";
 import InfoBox from "./infobox";
 import { SankeyAndDonutSyncProvider } from "../SankeyAndDonutSync";
@@ -97,7 +97,7 @@ export default function ChartGroup({
             } as React.CSSProperties} // cast for TS
         >
             <span className="font-bold">{campusName}</span>
-            <LineChartSchoolTrends
+            <LineCharts
                 rawDegreeData={rawDegreeData}
                 campus={campusName}
                 lineColor={lineColor}

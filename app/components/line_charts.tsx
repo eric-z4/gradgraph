@@ -31,7 +31,7 @@ interface LineChartProps {
   isActive?: boolean;
 }
 
-export default function LineChartSchoolTrends({
+export default function LineCharts({
   rawDegreeData,
   campus,
   lineColor = "rgb(29, 120, 180)",
