@@ -1,8 +1,12 @@
 "use client";
 
-import { useState } from 'react';
+import { ReactNode, useState, useMemo } from 'react';
 import { BsInfoCircle, BsX } from 'react-icons/bs';
 import '../css/infobox.css';
+import ManoaMD from '../markdown/manoa.mdx';
+import HiloMD from '../markdown/hilo.mdx';
+import WestOahuMD from '../markdown/west_oahu.mdx';
+import InfoDefMD from '../markdown/info_default.mdx';
 
 interface InfoBoxProps {
     campus?: string;
@@ -19,19 +23,18 @@ export default function InfoBox({
 }: InfoBoxProps)
 {
     const [showInfoCard, setShowInfoCard] = useState(false);
-    const getInfoText = (campusName: string): string => {
-        switch(campusName) {
+    const infoText = useMemo((): ReactNode | null => {
+        switch (campus) {
             case "UH Manoa":
-                return "[UH Manoa data viz stuff goes here]";
+                return <ManoaMD />;
             case "UH Hilo":
-                return "[UH Hilo data viz stuff goes here]";
+                return <HiloMD />;
             case "UH West O`ahu":
-                return "[UH West Oʻahu data viz stuff goes here]";
+                return <WestOahuMD />;
             default:
-                return "Select a campus to view detailed information about its degree distribution.";
+                return <InfoDefMD />;
         }
-    };
-    const infoText = getInfoText(campus);
+    }, [campus]);
 
     /*
     * - Have text be changeable (Text as useState)
@@ -72,7 +75,7 @@ export default function InfoBox({
                         {campus} FY {yearNumber}
                     </div>
                     {/* Campus-specific dataviz may go here? Can change the structure if need be */}
-                    <p className="text-base text-neutral-1 leading-relaxed">{infoText}</p>
+                    <span className="text-base text-neutral-1 leading-relaxed">{infoText}</span>
                 </div>
             </div>
 
