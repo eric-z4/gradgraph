@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useState, useMemo } from 'react';
+import { ReactNode, useState } from 'react';
 import { BsInfoCircle, BsX } from 'react-icons/bs';
 import '../css/infobox.css';
 import ManoaMD from '../markdown/manoa.mdx';
