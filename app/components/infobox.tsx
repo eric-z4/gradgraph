@@ -58,7 +58,7 @@ export default function InfoBox({
     *     - Campus name
     *     - Fiscal Year?
     *     - Major percentage explanation?
-    *     - Breakdown of major by gender? and undergrad/grad degree
+    *     - Breakdown of major by gender?
     */
     const yearNumber = year ? year.replace(/[^\d]/g, '') : '2025';
 
@@ -80,7 +80,7 @@ export default function InfoBox({
                     </button>
                 </h1>
                 <h2 className="pb-2 text-base text-neutral-1/80">
-                    <em>Visualizing the degrees awarded across the University of Hawai‘i system</em>
+                    <em>Visualizing the degrees awarded across the University of Hawai‘i</em>
                 </h2>
                 <hr className="border-t border-neutral-1/30"></hr>
                 <div className="pt-3">
