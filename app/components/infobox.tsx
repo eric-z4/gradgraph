@@ -7,19 +7,34 @@ import ManoaMD from '../markdown/manoa.mdx';
 import HiloMD from '../markdown/hilo.mdx';
 import WestOahuMD from '../markdown/west_oahu.mdx';
 import InfoDefMD from '../markdown/info_default.mdx';
+import InfoBoxBarChart from './infobox_bar_chart';
 
 interface InfoBoxProps {
     campus?: string;
     year?: string;
     className?: string;
     color?: string;
+    data: Array<{
+        FISCAL_YEAR: string;
+        CAMPUS: string;
+        CIP: string;
+        CIP_DESC: string;
+        GROUP1: string;
+        GROUP2: string;
+        GROUP3: string;
+        GROUP4: string;
+        GROUP5: string;
+        OUTCOME: string;
+        AWARDS: number;
+    }>;
 }
 
 export default function InfoBox({
     campus = "UH Manoa",
     year = "FY 2025",
     className = "",
-    color = "#024731"
+    color = "#024731",
+    data
 }: InfoBoxProps)
 {
     const [showInfoCard, setShowInfoCard] = useState(false);
@@ -77,6 +92,20 @@ export default function InfoBox({
                     </div>
                     {/* Campus-specific dataviz may go here? Can change the structure if need be */}
                     <span className="text-base text-neutral-1 leading-relaxed">{infoText}</span>
+                    <div
+                        style={{
+                            width: "100%",
+                            maxWidth: "350px",
+                            height: "220px",
+                            margin: "16px auto",
+                            padding: "8px",
+                            background: "rgba(255,255,255,0.05)",
+                            borderRadius: "12px",
+                            boxSizing: "border-box"
+                        }}
+                    >
+                        <InfoBoxBarChart data={data} campus={campus} year={year} className="w-full h-full"/>
+                    </div>
                 </div>
             </div>
 

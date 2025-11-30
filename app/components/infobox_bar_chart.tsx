@@ -46,5 +46,70 @@ function barChartDataProcess(data: DataColumns[]) {
 }
 
 export default function InfoBoxBarChart({ data, campus, year, className = "" }: InfoBoxBarChartProps) {
+    const chartRef = useRef<HTMLDivElement>(null);
+    const chartInstance = useRef<echarts.EChartsType | null>(null);
 
+    const yearNumber = year ? year.replace(/[^\d]/g, '') : '2025';
+
+    useEffect(() => {
+        if (chartRef.current) {
+            chartInstance.current = echarts.init(chartRef.current);
+        }
+
+        return () => {
+            chartInstance.current?.dispose();
+            chartInstance.current = null;
+        };
+    }, []);
+
+    useEffect(() => {
+        if (!chartInstance.current) return;
+
+        const { xAxisData, yAxisData } = barChartDataProcess(data);
+
+        const option = {
+            title: {
+                text: `${campus} Awards by Degree Type (${year})`,
+                subtext: `Fiscal Year ${yearNumber}`,
+            },
+            tooltip: {
+                trigger: "axis",
+                axisPointer: {
+                    type: "shadow",
+                },
+            },
+            grid: {
+                left: "3%",
+                right: "4%",
+                bottom: "3%",
+                containLabel: true,
+            },
+            xAxis: [
+                {
+                    type: "category",
+                    data: xAxisData,
+                    axisTick: { alignWithLabel: true },
+                },
+            ],
+            yAxis: [{ type: "value" }],
+            series: [
+                {
+                    name: "Awards",
+                    type: "bar",
+                    barWidth: "60%",
+                    data: yAxisData,
+                },
+            ],
+        };
+
+        chartInstance.current.setOption(option);
+    }, [data, campus, year, yearNumber]);
+
+    return (
+        <div
+            ref={chartRef}
+            className={className}
+            style={{ width: "95%", height: "95%" }}
+        />
+    );
 }
