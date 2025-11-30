@@ -111,6 +111,7 @@ export default function InfoBoxBarChart({ data, campus, year, className = "" }: 
                     type: "bar",
                     barWidth: "60%",
                     data: yAxisData,
+                    color: '#FAF9F6',
                 },
             ],
         };
