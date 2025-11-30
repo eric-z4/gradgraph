@@ -37,7 +37,7 @@ function donutDataProcess(data: DataColumns[]) {
     const college = row.GROUP1;
     if (!college) continue;
 
-    const awards = Number(row.AWARDS || 0);
+    const awards = Number(row.AWARDS) || 0;
     totalAwards[college] = (totalAwards[college] || 0) + awards;
   }
 
