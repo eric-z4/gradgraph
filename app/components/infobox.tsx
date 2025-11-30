@@ -109,6 +109,8 @@ export default function InfoBox({
                             <p className="text-sm text-neutral-2 pt-2 border-t border-neutral-2/20">
                                 Data source: <a href="https://opendata.hawaii.gov/dataset/university-of-hawaii-student-degrees-awarded/resource/3a0b8368-71a7-4402-b9c7-9fc5a398a952" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-600 transition-colors">Hawaii Open Data</a>
                                 <br></br>
+                                Website code: <a href="https://github.com/eric-z4/gradgraph" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-600 transition-colors">GitHub</a>
+                                <br></br>
                                 Created by <a href="https://github.com/eric-z4" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-600 transition-colors">Eric Zhou</a>, <a href="https://github.com/jpinera" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-600 transition-colors">Jaren Pinera</a>, and <a href="https://github.com/usradam" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-600 transition-colors">Adam Graham</a>
                             </p>
                         </div>
