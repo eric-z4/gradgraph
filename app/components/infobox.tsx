@@ -23,8 +23,8 @@ export default function InfoBox({
 }: InfoBoxProps)
 {
     const [showInfoCard, setShowInfoCard] = useState(false);
-    const infoText = useMemo((): ReactNode | null => {
-        switch (campus) {
+    const getInfoText = (campusName: string): ReactNode | null => {
+        switch (campusName) {
             case "UH Manoa":
                 return <ManoaMD />;
             case "UH Hilo":
@@ -34,7 +34,8 @@ export default function InfoBox({
             default:
                 return <InfoDefMD />;
         }
-    }, [campus]);
+    };
+    const infoText = getInfoText(campus);
 
     /*
     * - Have text be changeable (Text as useState)
