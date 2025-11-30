@@ -20,65 +20,57 @@ function sankeyDataProcess(data) {
         itemStyle: { color: "rgb(230, 230, 230)" },
     }];
     let links = [];
-    let prevGroup = [{ name: "Total ", degrees: totalDegrees }];
+    let prevGroup = [{ node: {}, link: {} }];
     let depthOffset = 0;
 
     for (let i = 1; i <= 5; i++) {
-        // Getting groups, "parent" groups, and degrees
         const currentGroup = [...new Set(data.map(item => item["GROUP" + i]))]
             .filter(item => item != "")
-            .map(groupRow => {
+            .map((groupRow, j) => {
                 const dataRows = data.filter(item => item["GROUP" + i] === groupRow);
-                const tempObj = {
-                    name: groupRow + i,
-                    degrees: dataRows
-                        .reduce((total, item) => total + parseInt(item.AWARDS), 0),
-                    parent: i > 1 ? dataRows
-                        .map(item => item["GROUP" + (i - 1)])[0] + (i - 1) : "Total ",
-                    depth: i
-                };
-                tempObj.parent_degrees = prevGroup
-                    .filter(item => item.name === tempObj.parent)[0].degrees;
+                const dataDegrees = dataRows.reduce((total, item) => total + parseInt(item.AWARDS), 0);
+                const dataParent = i > 1 ? dataRows.map(item => item["GROUP" + (i - 1)])[0] + (i - 1) : "Total ";
+                const dataParentDegrees = i > 1 ? prevGroup.filter(prvItem => prvItem.link.target === dataParent)[0].link.value : totalDegrees;
 
-                return tempObj;
+                const node = {
+                    name: groupRow + i,
+                    depth: i,
+                    parent_value: dataParentDegrees,
+                    itemStyle: { color: "rgb(0, 0, 0)" },
+                    label: {
+                        formatter: (d) => {
+                            return d.name.slice(0, -1).length > 16 ? d.name.slice(0, -1).slice(0, 16) + "..." : d.name.slice(0, -1);
+                        }
+                    }
+                };
+                const link = {
+                    source: dataParent,
+                    target: groupRow + i,
+                    value: dataDegrees,
+                    parent_value: dataParentDegrees
+                };
+
+                return {node, link};
             });
         currentGroup.sort((a, b) => {
-            if (a.degrees < b.degrees) {
+            if (a.link.value < b.link.value) {
                 return 1;
-            } else if (a.degrees > b.degrees) {
+            } else if (a.link.value < b.link.value) {
                 return -1;
             } else {
                 return 0;
             }
         });
+        currentGroup.forEach((item, k) => {
+            item.node.itemStyle.color = i > 1 ? prevGroup.filter(prvItem => prvItem.link.target === item.link.source)[0].node.itemStyle.color : d3.rgb(d3.hsl(360 * (k / currentGroup.length), 1.0, 0.65)).toString();
+            item.node.depth += depthOffset;
 
-        // Create nodes and links
-        currentGroup.forEach((item, j) => {
-            // Generate color for first group (rest are inherited by parent)
-            item.color = i > 1 ? prevGroup.filter(prvItem => prvItem.name === item.parent)[0].color :
-                d3.rgb(d3.hsl(360 * (j / currentGroup.length), 1.0, 0.65)).toString();
-
-            nodes.push({
-                name: item.name,
-                depth: item.depth + depthOffset,
-                parent_value: item.parent_degrees,
-                itemStyle: { color: item.color },
-                label: {
-                    formatter: (d) => {
-                        return d.name.slice(0, -1).length > 16 ? d.name.slice(0, -1).slice(0, 16) + "..." : d.name.slice(0, -1);
-                    }
-                }
-            });
-            links.push({
-                source: item.parent,
-                target: item.name,
-                value: item.degrees,
-                parent_value: item.parent_degrees
-            });
-
-            if (j > nodeLimit * (depthOffset + 1)) {
+            if (k > nodeLimit * (depthOffset + 1)) {
                 depthOffset++;
             }
+
+            nodes.push(item.node);
+            links.push(item.link);
         });
 
         prevGroup = currentGroup;
@@ -241,20 +233,17 @@ export default function Sankey({
 
     // Update sankey with new data
     useEffect(() => {
-        const chart = getInstanceByDom(chartRef.current);
         const sankeyData = sankeyDataProcess(data);
 
         option.current.series.data = sankeyData.nodes;
         option.current.series.links = sankeyData.links;
         option.current.title.text = `${campus} Degrees Awarded Breakdown`;
 
-        chart.setOption(option.current);
+        chartInstance.current.setOption(option.current);
     }, [data, campus]);
 
     return <div ref={chartRef} className={className} onDoubleClick={() => {
         // Reset zoom and center on double click
-        option.current.series.zoom = 1;
-        option.current.series.center = ["50%", "50%"];
-        getInstanceByDom(chartRef.current).setOption(option.current);
+        chartInstance.current.setOption({ series: { type:"sankey", zoom: 1, center: ["50%", "50%"] } });
     }}></div >;
 }
