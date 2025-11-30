@@ -1,7 +1,7 @@
 "use client";
 
 import * as d3 from "d3";
-import { getInstanceByDom, init } from "echarts";
+import { init } from "echarts";
 import { useEffect, useRef } from "react";
 import { useSankeyAndDonutSync } from "../SankeyAndDonutSync";
 
