@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useMemo } from "react";
 import * as echarts from "echarts";
 
 interface DataColumns {
@@ -50,6 +50,8 @@ export default function InfoBoxBarChart({ data, campus, year, className = "" }: 
     const chartInstance = useRef<echarts.EChartsType | null>(null);
 
     const yearNumber = year ? year.replace(/[^\d]/g, '') : '2025';
+    const processedData = useMemo(() => barChartDataProcess(data), [data]);
+    const { xAxisData, yAxisData } = processedData;
 
     useEffect(() => {
         if (chartRef.current) {
@@ -64,8 +66,6 @@ export default function InfoBoxBarChart({ data, campus, year, className = "" }: 
 
     useEffect(() => {
         if (!chartInstance.current) return;
-
-        const { xAxisData, yAxisData } = barChartDataProcess(data);
 
         const option = {
             title: {
@@ -117,7 +117,7 @@ export default function InfoBoxBarChart({ data, campus, year, className = "" }: 
         };
 
         chartInstance.current.setOption(option);
-    }, [data, campus, year, yearNumber]);
+    }, [xAxisData, yAxisData, campus, year, yearNumber]);
 
     return (
         <div

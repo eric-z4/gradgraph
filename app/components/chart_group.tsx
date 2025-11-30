@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Sankey from "./sankey";
 import LineCharts from "./line_charts";
 import Donut from "./donut";
@@ -63,7 +63,7 @@ export default function ChartGroup({
 
     // Get current year for selected campus
     const currentYear = years[campus] || Year.Y2025;
-    const filteredData = rawDegreeData.filter(item => item.CAMPUS == campus && item.FISCAL_YEAR == currentYear);
+    const filteredData = useMemo(() => rawDegreeData.filter(item => item.CAMPUS == campus && item.FISCAL_YEAR == currentYear), [rawDegreeData, campus, currentYear]);
 
     // Line chart selection
     const handleCampusClick = (campusName: string) => {
