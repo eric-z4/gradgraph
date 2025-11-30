@@ -69,8 +69,15 @@ export default function InfoBoxBarChart({ data, campus, year, className = "" }: 
 
         const option = {
             title: {
-                text: `${campus} Awards by Degree Type (${year})`,
+                text: `${campus} Degrees by Type`,
+                textStyle: {
+                    fontsize: 10,
+                    color: '#fff'
+                },
                 subtext: `Fiscal Year ${yearNumber}`,
+                subtextStyle: {
+                    color: 'fff'
+                }
             },
             tooltip: {
                 trigger: "axis",
@@ -79,9 +86,9 @@ export default function InfoBoxBarChart({ data, campus, year, className = "" }: 
                 },
             },
             grid: {
-                left: "3%",
-                right: "4%",
-                bottom: "3%",
+                left: "8%",
+                right: "8%",
+                bottom: "5%",
                 containLabel: true,
             },
             xAxis: [
@@ -89,9 +96,15 @@ export default function InfoBoxBarChart({ data, campus, year, className = "" }: 
                     type: "category",
                     data: xAxisData,
                     axisTick: { alignWithLabel: true },
+                    axisLabel: { color: '#fff', fontSize: 12, rotate: 20 },
                 },
             ],
-            yAxis: [{ type: "value" }],
+            yAxis: [
+                {
+                    type: "value",
+                    axisLabel: { color: '#fff', fontSize: 12 }
+                }
+            ],
             series: [
                 {
                     name: "Awards",
@@ -109,7 +122,7 @@ export default function InfoBoxBarChart({ data, campus, year, className = "" }: 
         <div
             ref={chartRef}
             className={className}
-            style={{ width: "95%", height: "95%" }}
+            style={{ width: "100%", height: "100%" }}
         />
     );
 }

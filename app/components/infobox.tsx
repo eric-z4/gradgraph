@@ -94,11 +94,8 @@ export default function InfoBox({
                     <span className="text-base text-neutral-1 leading-relaxed">{infoText}</span>
                     <div
                         style={{
-                            width: "100%",
-                            maxWidth: "350px",
-                            height: "220px",
+                            height: "250px",
                             margin: "16px auto",
-                            padding: "8px",
                             background: "rgba(255,255,255,0.05)",
                             borderRadius: "12px",
                             boxSizing: "border-box"
