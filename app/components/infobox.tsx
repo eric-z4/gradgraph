@@ -60,8 +60,6 @@ export default function InfoBox({
     *     - Major percentage explanation?
     *     - Breakdown of major by gender?
     */
-    const yearNumber = year ? year.replace(/[^\d]/g, '') : '2025';
-
     return (
         <div className={`${className} relative`}>
             <div 
@@ -84,13 +82,6 @@ export default function InfoBox({
                 </h2>
                 <hr className="border-t border-neutral-1/30"></hr>
                 <div className="pt-3">
-                    <div 
-                        className="inline-block px-3 py-1 rounded-full text-sm mb-3"
-                        style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)', color: '#ffffff' }}
-                    >
-                        {campus} FY {yearNumber}
-                    </div>
-                    {/* Campus-specific dataviz may go here? Can change the structure if need be */}
                     <span className="text-base text-neutral-1 leading-relaxed">{infoText}</span>
                     <div
                         style={{
@@ -135,7 +126,7 @@ export default function InfoBox({
                             <p className="text-sm text-neutral-2 pt-2 border-t border-neutral-2/20">
                                 Data source: <a href="https://opendata.hawaii.gov/dataset/university-of-hawaii-student-degrees-awarded/resource/3a0b8368-71a7-4402-b9c7-9fc5a398a952" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-600 transition-colors">Hawaii Open Data</a>
                                 <br></br>
-                                Website code: <a href="https://github.com/eric-z4/gradgraph" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-600 transition-colors">GitHub</a>
+                                Source code: <a href="https://github.com/eric-z4/gradgraph" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-600 transition-colors">GitHub</a>
                                 <br></br>
                                 Created by <a href="https://github.com/eric-z4" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-600 transition-colors">Eric Zhou</a>, <a href="https://github.com/jpinera" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-600 transition-colors">Jaren Pinera</a>, and <a href="https://github.com/usradam" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-600 transition-colors">Adam Graham</a>
                             </p>
