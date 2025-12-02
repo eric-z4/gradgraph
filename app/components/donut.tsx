@@ -26,10 +26,69 @@ interface DonutProps {
   className?: string;
 }
 
+// This is why I don't want to change my sankey.jsx to Typescript
+interface CustomOptionProps extends echarts.EChartsCoreOption {
+    title: {
+        text: string,
+        subtext: string,
+        left: string,
+        top: number,
+        textStyle: {
+            fontSize: number;
+        },
+        subtextStyle: {
+            fontSize: number;
+        };
+    },
+    tooltip: {
+        trigger: string,
+        formatter: string;
+    },
+    legend: {
+        orient: string,
+        left: string,
+        bottom: number,
+        data: string[],
+        textStyle: {
+            fontSize: number;
+        },
+        itemGap: number,
+        itemWidth: number,
+        itemHeight: number,
+        selectedMode: boolean;
+    },
+    series: {
+            name: string,
+            type: string,
+            radius: string[],
+            center: string[],
+            data: {
+                name: string,
+                value: number,
+                itemStyle: { color: string; };
+            }[],
+            label: {
+                fontSize: number,
+                distance: number;
+            },
+            emphasis: {
+                itemStyle: {
+                    shadowBlur: number,
+                    shadowOffsetX: number,
+                    shadowColor: string,
+                };
+            },
+            itemStyle: {
+                borderColor: string,
+                borderWidth: number;
+            };
+    }[];
+}
+
 export default function Donut({ data, campus, year, className="" }: DonutProps) {
   const chartRef = useRef<HTMLDivElement | null>(null);
     const chartInstance = useRef<echarts.ECharts | null>(null);
-    const option = useRef({});
+    const option = useRef<CustomOptionProps | null>(null);
   const { hoveredCollege, setHoveredCollege } = useSankeyAndDonutSync();
     const yearNumber = year ? year.replace(/[^\d]/g, '') : '2025';
     const [legendData, setLegendData] = useState<string[]>([]);
@@ -38,9 +97,9 @@ export default function Donut({ data, campus, year, className="" }: DonutProps) 
   useEffect(() => {
     if (!chartRef.current) return;
 
-     chartInstance.current = echarts.init(chartRef.current);
+      chartInstance.current = echarts.init(chartRef.current);
 
-     option.current = {
+      option.current = {
         title: {
             text: "",
             subtext: "",
@@ -184,15 +243,14 @@ export default function Donut({ data, campus, year, className="" }: DonutProps) 
   useEffect(() => {
     if (!chartInstance.current) return;
 
-      // I tried using echarts.ComposeOption on option's useRef to get rid of these type errors,
-      // but I kept encountering error TS18048 and TS2339. This is why my Sankey is JSX.
-      // Note that this WORKS, just that typescript doesn't like option not having a type
-      option.current.title.text = `${campus} Degrees Awarded`;
-      option.current.title.subtext = `Fiscal Year ${yearNumber}`;
-      option.current.legend.data = legendData;
-      option.current.series[0].data = seriesData;
-    
-      chartInstance.current.setOption(option.current);
+      if (option.current != null) {
+          option.current.title.text = `${campus} Degrees Awarded`;
+          option.current.title.subtext = `Fiscal Year ${yearNumber}`;
+          option.current.legend.data = legendData;
+          option.current.series[0].data = seriesData;
+
+          chartInstance.current.setOption(option.current);
+      }
   }, [legendData, seriesData, campus, year, yearNumber]);
 
     return (

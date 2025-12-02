@@ -24,10 +24,54 @@ interface InfoBoxBarChartProps {
   className?: string;
 }
 
+// This is why I don't want to change my sankey.jsx to Typescript
+interface CustomOptionProps extends echarts.EChartsCoreOption {
+    title: {
+        text: string,
+        textStyle: {
+            fontsize: number,
+            color: string;
+        },
+        subtext: string,
+        subtextStyle: {
+            color: string;
+        };
+    },
+    tooltip: {
+        trigger: string,
+        axisPointer: {
+            type: string,
+        },
+    },
+    grid: {
+        left: string,
+        right: string,
+        bottom: string,
+        containLabel: boolean,
+    },
+    xAxis: {
+            type: string,
+            data: string[],
+            axisTick: { alignWithLabel: boolean; },
+            axisLabel: { color: string, fontSize: number, rotate: number; },
+    }[],
+    yAxis: {
+            type: string,
+            axisLabel: { color: string, fontSize: number; };
+    }[],
+    series: {
+            name: string,
+            type: string,
+            barWidth: string,
+            data: number[],
+            color: string,
+    }[]
+}
+
 export default function InfoBoxBarChart({ data, campus, year, className = "" }: InfoBoxBarChartProps) {
     const chartRef = useRef<HTMLDivElement>(null);
     const chartInstance = useRef<echarts.EChartsType | null>(null);
-    const option = useRef({});
+    const option = useRef<CustomOptionProps | null>(null);
     const yearNumber = year ? year.replace(/[^\d]/g, '') : '2025';
     const [xAxisData, setXAxisData] = useState<string[]>([]);
     const [yAxisData, setYAxisData] = useState<number[]>([]);
@@ -120,15 +164,14 @@ export default function InfoBoxBarChart({ data, campus, year, className = "" }: 
     useEffect(() => {
         if (!chartInstance.current) return;
 
-        // I tried using echarts.ComposeOption on option's useRef to get rid of these type errors,
-        // but I kept encountering error TS18048 and TS2339. This is why my Sankey is JSX.
-        // Note that this WORKS, just that typescript doesn't like option not having a type
-        option.current.title.text = `${campus} Degrees Awarded`;
-        option.current.title.subtext = `Fiscal Year ${yearNumber}`;
-        option.current.xAxis[0].data = xAxisData;
-        option.current.series[0].data = yAxisData;
+        if (option.current != null) {
+            option.current.title.text = `${campus} Degrees Awarded`;
+            option.current.title.subtext = `Fiscal Year ${yearNumber}`;
+            option.current.xAxis[0].data = xAxisData;
+            option.current.series[0].data = yAxisData;
 
-        chartInstance.current.setOption(option.current);
+            chartInstance.current.setOption(option.current);
+        }
     }, [xAxisData, yAxisData, data, campus, year, yearNumber]);
 
     return (
