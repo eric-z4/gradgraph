@@ -102,7 +102,7 @@ export default function Sankey({
 
         option.current = {
             title: {
-                text: `${campus} Degrees Awarded Breakdown`,
+                text: "",
                 top: 0,
                 textStyle: {
                     fontSize: 16
@@ -208,14 +208,15 @@ export default function Sankey({
 
         return () => {
             chart?.dispose();
+            chartInstance.current = null;
             window.removeEventListener("resize", handleResize);
         };
-    }, [setHoveredCollege, campus]);
+    }, [setHoveredCollege]);
 
     // Handle hover from donut chart
     useEffect(() => {
         if (!chartInstance.current) return;
-
+        
         if (hoveredCollege != null) {
             // Highlight the corresponding college node (add 1 for "Total" node offset)
             chartInstance.current.dispatchAction({
@@ -233,10 +234,10 @@ export default function Sankey({
 
     // Update sankey with new data
     useEffect(() => {
-        const sankeyData = sankeyDataProcess(data);
-
-        option.current.series.data = sankeyData.nodes;
-        option.current.series.links = sankeyData.links;
+        const { nodes, links } = sankeyDataProcess(data);
+        
+        option.current.series.data = nodes;
+        option.current.series.links = links;
         option.current.title.text = `${campus} Degrees Awarded Breakdown`;
 
         chartInstance.current.setOption(option.current);

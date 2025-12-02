@@ -69,6 +69,7 @@ function donutDataProcess(data: DataColumns[]) {
 export default function Donut({ data, campus, year, className="" }: DonutProps) {
   const chartRef = useRef<HTMLDivElement | null>(null);
   const chartInstance = useRef<echarts.ECharts | null>(null);
+  const option = useRef({});
   const { hoveredCollege, setHoveredCollege } = useSankeyAndDonutSync();
 
   const yearNumber = year ? year.replace(/[^\d]/g, '') : '2025';
@@ -76,7 +77,63 @@ export default function Donut({ data, campus, year, className="" }: DonutProps) 
   useEffect(() => {
     if (!chartRef.current) return;
 
-    chartInstance.current = echarts.init(chartRef.current);
+     chartInstance.current = echarts.init(chartRef.current);
+
+     option.current = {
+        title: {
+            text: "",
+            subtext: "",
+            left: "center",
+            top: 0,
+            textStyle: {
+                fontSize: 16
+            },
+            subtextStyle: {
+                fontSize: 14
+            }
+        },
+        tooltip: {
+            trigger: "item",
+            formatter: "{a} <br/>{b} : {c} ({d}%)"
+        },
+        legend: {
+            orient: "horizontal",
+            left: "center",
+            bottom: 0,
+            data: [],
+            textStyle: {
+                fontSize: 12
+            },
+            itemGap: 6,
+            itemWidth: 10,
+            itemHeight: 10,
+            selectedMode: false
+        },
+        series: [
+            {
+                name: "Degrees Awarded",
+                type: "pie",
+                radius: ["28%", "60%"],
+                center: ["50%", "45%"], // [horizontal, vertical]
+                data: [],
+                label: {
+                    fontSize: 11,
+                    distance: 5
+                },
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: "rgba(0, 0, 0, 0.5)",
+                    }
+                },
+                itemStyle: {
+                    borderColor: "rgb(20, 20, 20)",
+                    borderWidth: 0.5
+                }
+            }
+        ]
+      }
 
     chartInstance.current.on("mouseover", params => {
       if (params.dataIndex != null && chartInstance.current) {
@@ -124,62 +181,12 @@ export default function Donut({ data, campus, year, className="" }: DonutProps) 
 
     const { legendData, seriesData } = donutDataProcess(data);
 
-    const option = {
-      title: {
-        text: `${campus} Degrees Awarded`,
-        subtext: `Fiscal Year ${yearNumber}`,
-        left: "center",
-        top: 0,
-        textStyle: {
-          fontSize: 16
-        },
-        subtextStyle: {
-          fontSize: 14
-        }
-      },
-      tooltip: {
-        trigger: "item",
-        formatter: "{a} <br/>{b} : {c} ({d}%)"
-      },
-      legend: {
-        orient: "horizontal",
-        left: "center",
-        bottom: 0,
-        data: legendData,
-        textStyle: {
-          fontSize: 12
-        },
-        itemGap: 6,
-        itemWidth: 10,
-        itemHeight: 10,
-        selectedMode: false
-      },
-      series: [
-        {
-          name: "Degrees Awarded",
-          type: "pie",
-          radius: ["28%", "60%"],
-          center: ["50%", "45%"], // [horizontal, vertical]
-          data: seriesData,
-          label: {
-            fontSize: 11,
-            distance: 5
-          },
-          emphasis: {
-            itemStyle: {
-              shadowBlur: 10,
-              shadowOffsetX: 0,
-              shadowColor: "rgba(0, 0, 0, 0.5)",
-            }
-          },
-          itemStyle: {
-            borderColor: "rgb(20, 20, 20)",
-            borderWidth: 0.5
-          }
-        }
-      ]
-    };
-      chartInstance.current.setOption(option);
+      option.current.title.text = `${campus} Degrees Awarded`;
+      option.current.title.subtext = `Fiscal Year ${yearNumber}`;
+      option.current.legend.data = legendData;
+      option.current.series[0].data = seriesData;
+    
+      chartInstance.current.setOption(option.current);
   }, [data, campus, year, yearNumber]);
 
     return (

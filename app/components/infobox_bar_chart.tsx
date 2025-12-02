@@ -48,33 +48,24 @@ function barChartDataProcess(data: DataColumns[]) {
 export default function InfoBoxBarChart({ data, campus, year, className = "" }: InfoBoxBarChartProps) {
     const chartRef = useRef<HTMLDivElement>(null);
     const chartInstance = useRef<echarts.EChartsType | null>(null);
-
+    const option = useRef({});
     const yearNumber = year ? year.replace(/[^\d]/g, '') : '2025';
-    const processedData = useMemo(() => barChartDataProcess(data), [data]);
-    const { xAxisData, yAxisData } = processedData;
+    //const processedData = useMemo(() => barChartDataProcess(data), [data]);
+    //const { xAxisData, yAxisData } = processedData;
 
     useEffect(() => {
         if (chartRef.current) {
             chartInstance.current = echarts.init(chartRef.current);
         }
-
-        return () => {
-            chartInstance.current?.dispose();
-            chartInstance.current = null;
-        };
-    }, []);
-
-    useEffect(() => {
-        if (!chartInstance.current) return;
-
-        const option = {
+        
+        option.current = {
             title: {
-                text: `${campus} Degrees by Type`,
+                text: "",
                 textStyle: {
                     fontsize: 10,
                     color: '#fff'
                 },
-                subtext: `Fiscal Year ${yearNumber}`,
+                subtext: "",
                 subtextStyle: {
                     color: 'fff'
                 }
@@ -94,7 +85,7 @@ export default function InfoBoxBarChart({ data, campus, year, className = "" }: 
             xAxis: [
                 {
                     type: "category",
-                    data: xAxisData,
+                    data: [],
                     axisTick: { alignWithLabel: true },
                     axisLabel: { color: '#fff', fontSize: 12, rotate: 20 },
                 },
@@ -110,14 +101,29 @@ export default function InfoBoxBarChart({ data, campus, year, className = "" }: 
                     name: "Awards",
                     type: "bar",
                     barWidth: "60%",
-                    data: yAxisData,
+                    data: [],
                     color: '#FAF9F6',
                 },
             ],
-        };
+        }
 
-        chartInstance.current.setOption(option);
-    }, [xAxisData, yAxisData, campus, year, yearNumber]);
+        return () => {
+            chartInstance.current?.dispose();
+            chartInstance.current = null;
+        };
+    }, []);
+
+    useEffect(() => {
+        if (!chartInstance.current) return;
+        const { xAxisData, yAxisData } = barChartDataProcess(data);
+
+        option.current.title.text = `${campus} Degrees Awarded`;
+        option.current.title.subtext = `Fiscal Year ${yearNumber}`;
+        option.current.xAxis[0].data = xAxisData;
+        option.current.series[0].data = yAxisData;
+
+        chartInstance.current.setOption(option.current);
+    }, [data, campus, year, yearNumber]);
 
     return (
         <div
