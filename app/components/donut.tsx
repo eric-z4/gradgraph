@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as echarts from "echarts";
 import * as d3 from "d3";
 import { useSankeyAndDonutSync } from "../SankeyAndDonutSync";
@@ -26,53 +26,14 @@ interface DonutProps {
   className?: string;
 }
 
-function donutDataProcess(data: DataColumns[]) {
-    if (!data || !Array.isArray(data)) {
-        return { legendData: [], seriesData: [] };
-    }
-    
-  const totalAwards = {} as Record<string, number>;
-
-  for (const row of data) {
-    const college = row.GROUP1;
-    if (!college) continue;
-
-    const awards = Number(row.AWARDS) || 0;
-    totalAwards[college] = (totalAwards[college] || 0) + awards;
-  }
-
-    // Create array of the dictionary objects and sort by value descending
-    const collegeData = Object.entries(totalAwards)
-        .map(([name, value]) => ({ name, value }))
-        .sort((a, b) => b.value - a.value);
-
-    // Match D3 color scheme of the Sankey chart
-    const colors = collegeData.map((_, i) => {
-        const hslColor = d3.hsl(360 * (i / collegeData.length), 1.0, 0.65);
-        return d3.rgb(hslColor).toString();
-    });
-
-    const seriesData = collegeData.map((item, i) => {
-        return {
-            name: item.name,
-            value: item.value,
-            itemStyle: { color: colors[i] }
-        };
-    });
-
-    return {
-        legendData: collegeData.map(d => d.name),
-        seriesData
-    };
-}
-
 export default function Donut({ data, campus, year, className="" }: DonutProps) {
   const chartRef = useRef<HTMLDivElement | null>(null);
-  const chartInstance = useRef<echarts.ECharts | null>(null);
-  const option = useRef({});
+    const chartInstance = useRef<echarts.ECharts | null>(null);
+    const option = useRef({});
   const { hoveredCollege, setHoveredCollege } = useSankeyAndDonutSync();
-
-  const yearNumber = year ? year.replace(/[^\d]/g, '') : '2025';
+    const yearNumber = year ? year.replace(/[^\d]/g, '') : '2025';
+    const [legendData, setLegendData] = useState<string[]>([]);
+    const [seriesData, setSeriesData] = useState<{ name: string, value: number, itemStyle: {color: string} }[]>([]);
 
   useEffect(() => {
     if (!chartRef.current) return;
@@ -176,18 +137,63 @@ export default function Donut({ data, campus, year, className="" }: DonutProps) 
     }
   }, [hoveredCollege]);
 
+    // Asynchronously process the data when it changes
+    useEffect(() => {
+        async function donutDataProcess(data: DataColumns[]) {
+            if (!data || !Array.isArray(data)) {
+                return { legendData: [], seriesData: [] };
+            }
+
+            const totalAwards = {} as Record<string, number>;
+
+            for (const row of data) {
+                const college = row.GROUP1;
+                if (!college) continue;
+
+                const awards = Number(row.AWARDS) || 0;
+                totalAwards[college] = (totalAwards[college] || 0) + awards;
+            }
+
+            // Create array of the dictionary objects and sort by value descending
+            const collegeData = Object.entries(totalAwards)
+                .map(([name, value]) => ({ name, value }))
+                .sort((a, b) => b.value - a.value);
+
+            // Match D3 color scheme of the Sankey chart
+            const colors = collegeData.map((_, i) => {
+                const hslColor = d3.hsl(360 * (i / collegeData.length), 1.0, 0.65);
+                return d3.rgb(hslColor).toString();
+            });
+
+            const seriesData = collegeData.map((item, i) => {
+                return {
+                    name: item.name,
+                    value: item.value,
+                    itemStyle: { color: colors[i] }
+                };
+            });
+
+            setLegendData(collegeData.map(d => d.name))
+            setSeriesData(seriesData);
+        }
+        donutDataProcess(data);
+
+        return () => { };
+    }, [data])
+
   useEffect(() => {
     if (!chartInstance.current) return;
 
-    const { legendData, seriesData } = donutDataProcess(data);
-
+      // I tried using echarts.ComposeOption on option's useRef to get rid of these type errors,
+      // but I kept encountering error TS18048 and TS2339. This is why my Sankey is JSX.
+      // Note that this WORKS, just that typescript doesn't like option not having a type
       option.current.title.text = `${campus} Degrees Awarded`;
       option.current.title.subtext = `Fiscal Year ${yearNumber}`;
       option.current.legend.data = legendData;
       option.current.series[0].data = seriesData;
     
       chartInstance.current.setOption(option.current);
-  }, [data, campus, year, yearNumber]);
+  }, [legendData, seriesData, campus, year, yearNumber]);
 
     return (
         <div className={className}>

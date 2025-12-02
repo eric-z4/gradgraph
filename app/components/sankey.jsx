@@ -2,82 +2,8 @@
 
 import * as d3 from "d3";
 import { init } from "echarts";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSankeyAndDonutSync } from "../SankeyAndDonutSync";
-
-function sankeyDataProcess(data) {
-    // Return empty structure if no data
-    if (!data || data.length === 0) {
-        return { nodes: [], links: [] };
-    }
-
-    const nodeLimit = 100;
-    const totalDegrees = data.reduce((total, item) => total + parseInt(item.AWARDS), 0);
-    let nodes = [{
-        name: "Total ",
-        depth: 0,
-        parent_value: totalDegrees,
-        itemStyle: { color: "rgb(230, 230, 230)" },
-    }];
-    let links = [];
-    let prevGroup = [{ node: {}, link: {} }];
-    let depthOffset = 0;
-
-    for (let i = 1; i <= 5; i++) {
-        const currentGroup = [...new Set(data.map(item => item["GROUP" + i]))]
-            .filter(item => item != "")
-            .map((groupRow, j) => {
-                const dataRows = data.filter(item => item["GROUP" + i] === groupRow);
-                const dataDegrees = dataRows.reduce((total, item) => total + parseInt(item.AWARDS), 0);
-                const dataParent = i > 1 ? dataRows.map(item => item["GROUP" + (i - 1)])[0] + (i - 1) : "Total ";
-                const dataParentDegrees = i > 1 ? prevGroup.filter(prvItem => prvItem.link.target === dataParent)[0].link.value : totalDegrees;
-
-                const node = {
-                    name: groupRow + i,
-                    depth: i,
-                    parent_value: dataParentDegrees,
-                    itemStyle: { color: "rgb(0, 0, 0)" },
-                    label: {
-                        formatter: (d) => {
-                            return d.name.slice(0, -1).length > 16 ? d.name.slice(0, -1).slice(0, 16) + "..." : d.name.slice(0, -1);
-                        }
-                    }
-                };
-                const link = {
-                    source: dataParent,
-                    target: groupRow + i,
-                    value: dataDegrees,
-                    parent_value: dataParentDegrees
-                };
-
-                return {node, link};
-            });
-        currentGroup.sort((a, b) => {
-            if (a.link.value < b.link.value) {
-                return 1;
-            } else if (a.link.value < b.link.value) {
-                return -1;
-            } else {
-                return 0;
-            }
-        });
-        currentGroup.forEach((item, k) => {
-            item.node.itemStyle.color = i > 1 ? prevGroup.filter(prvItem => prvItem.link.target === item.link.source)[0].node.itemStyle.color : d3.rgb(d3.hsl(360 * (k / currentGroup.length), 1.0, 0.65)).toString();
-            item.node.depth += depthOffset;
-
-            if (k > nodeLimit * (depthOffset + 1)) {
-                depthOffset++;
-            }
-
-            nodes.push(item.node);
-            links.push(item.link);
-        });
-
-        prevGroup = currentGroup;
-    }
-
-    return { nodes, links };
-}
 
 /*
 Some code for intiallizing echart copied from tania.dev
@@ -92,6 +18,8 @@ export default function Sankey({
     const chartInstance = useRef(null);
     const option = useRef({});
     const { hoveredCollege, setHoveredCollege } = useSankeyAndDonutSync();
+    const [nodes, setNodes] = useState([]);
+    const [links, setLinks] = useState([]);
 
     // Echart initialization
     useEffect(() => {
@@ -232,16 +160,95 @@ export default function Sankey({
         }
     }, [hoveredCollege]);
 
+    // Asynchronously process the data when it changes
+    useEffect(() => {
+        async function sankeyDataProcess(data) {
+            // Return empty structure if no data
+            if (!data || data.length === 0) {
+                return { nodes: [], links: [] };
+            }
+
+            const nodeLimit = 100;
+            const totalDegrees = data.reduce((total, item) => total + parseInt(item.AWARDS), 0);
+            let nodes = [{
+                name: "Total ",
+                depth: 0,
+                parent_value: totalDegrees,
+                itemStyle: { color: "rgb(230, 230, 230)" },
+            }];
+            let links = [];
+            let prevGroup = [{ node: {}, link: {} }];
+            let depthOffset = 0;
+
+            for (let i = 1; i <= 5; i++) {
+                const currentGroup = [...new Set(data.map(item => item["GROUP" + i]))]
+                    .filter(item => item != "")
+                    .map((groupRow, j) => {
+                        const dataRows = data.filter(item => item["GROUP" + i] === groupRow);
+                        const dataDegrees = dataRows.reduce((total, item) => total + parseInt(item.AWARDS), 0);
+                        const dataParent = i > 1 ? dataRows.map(item => item["GROUP" + (i - 1)])[0] + (i - 1) : "Total ";
+                        const dataParentDegrees = i > 1 ? prevGroup.filter(prvItem => prvItem.link.target === dataParent)[0].link.value : totalDegrees;
+
+                        const node = {
+                            name: groupRow + i,
+                            depth: i,
+                            parent_value: dataParentDegrees,
+                            itemStyle: { color: "rgb(0, 0, 0)" },
+                            label: {
+                                formatter: (d) => {
+                                    return d.name.slice(0, -1).length > 16 ? d.name.slice(0, -1).slice(0, 16) + "..." : d.name.slice(0, -1);
+                                }
+                            }
+                        };
+                        const link = {
+                            source: dataParent,
+                            target: groupRow + i,
+                            value: dataDegrees,
+                            parent_value: dataParentDegrees
+                        };
+
+                        return { node, link };
+                    });
+                currentGroup.sort((a, b) => {
+                    if (a.link.value < b.link.value) {
+                        return 1;
+                    } else if (a.link.value < b.link.value) {
+                        return -1;
+                    } else {
+                        return 0;
+                    }
+                });
+                currentGroup.forEach((item, k) => {
+                    item.node.itemStyle.color = i > 1 ? prevGroup.filter(prvItem => prvItem.link.target === item.link.source)[0].node.itemStyle.color : d3.rgb(d3.hsl(360 * (k / currentGroup.length), 1.0, 0.65)).toString();
+                    item.node.depth += depthOffset;
+
+                    if (k > nodeLimit * (depthOffset + 1)) {
+                        depthOffset++;
+                    }
+
+                    nodes.push(item.node);
+                    links.push(item.link);
+                });
+
+                prevGroup = currentGroup;
+            }
+
+            setNodes(nodes);
+            setLinks(links);
+        }
+        sankeyDataProcess(data);
+
+    }, [data])
+
     // Update sankey with new data
     useEffect(() => {
-        const { nodes, links } = sankeyDataProcess(data);
         
         option.current.series.data = nodes;
         option.current.series.links = links;
         option.current.title.text = `${campus} Degrees Awarded Breakdown`;
 
         chartInstance.current.setOption(option.current);
-    }, [data, campus]);
+    }, [nodes, links, campus]);
 
     return <div ref={chartRef} className={className} onDoubleClick={() => {
         // Reset zoom and center on double click
