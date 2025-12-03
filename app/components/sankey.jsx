@@ -93,14 +93,14 @@ export default function Sankey({
                                 ${params.data.source.slice(0, -1) + " --> " + params.data.target.slice(0, -1)}
                             </span>
                             <span style="float:right;margin-left:20px;"><span style="font-weight:900;">
-                                ${params.value + " / " + params.data.parent_value}
+                                ${params.value + " / " + params.data.parent_value.value}
                             </span> degrees awarded</span>`;
                         } else if (params.dataType === "node") {
                             return `<span style="font-weight:400;">
                                 ${params.name.slice(0, -1)}
                             </span>
                             <span style="float:right;margin-left:20px;"><span style="font-weight:900;">
-                                ${params.value + " / " + params.data.parent_value}
+                                ${params.value + " / " + params.data.parent_value.value}
                             </span> degrees awarded</span>`;
                         }
                     },
@@ -183,7 +183,7 @@ export default function Sankey({
                                 name: item["GROUP" + i] + i,
                                 depth: i,
                                 degrees: { value: item.AWARDS },
-                                parent_value: i > 1 ? mappedData.get(item["GROUP" + (i - 1)] + (i - 1)).node.degrees : totalDegrees,
+                                parent_value: i > 1 ? mappedData.get(item["GROUP" + (i - 1)] + (i - 1)).node.degrees : { value: totalDegrees },
                                 itemStyle: i > 1 ? mappedData.get(item["GROUP" + (i - 1)] + (i - 1)).node.itemStyle : { color: "rgb(0, 0, 0)" },
                                 label: {
                                     formatter: (d) => {
@@ -195,7 +195,7 @@ export default function Sankey({
                                 source: i > 1 ? item["GROUP" + (i - 1)] + (i - 1) : "Total ",
                                 target: item["GROUP" + i] + i,
                                 value: item.AWARDS,
-                                parent_value: i > 1 ? mappedData.get(item["GROUP" + (i - 1)]+ (i - 1)).node.degrees : totalDegrees
+                                parent_value: i > 1 ? mappedData.get(item["GROUP" + (i - 1)]+ (i - 1)).node.degrees : { value: totalDegrees }
                             }
                         });
                         groupCount[i - 1]++;
@@ -229,11 +229,11 @@ export default function Sankey({
             }
 
             setNodes([{
-                    name: "Total ",
-                    depth: 0,
-                    parent_value: totalDegrees,
-                    itemStyle: { color: "rgb(230, 230, 230)" },
-                }].concat(processedDataArr.map(item => item.node)));
+                name: "Total ",
+                depth: 0,
+                parent_value: { value: totalDegrees },
+                itemStyle: { color: "rgb(230, 230, 230)" },
+            }].concat(processedDataArr.map(item => item.node)));
             setLinks(processedDataArr.map(item => item.link));
         }
         sankeyDataProcess(data);
