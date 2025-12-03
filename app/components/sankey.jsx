@@ -170,71 +170,71 @@ export default function Sankey({
 
             const nodeLimit = 100;
             const totalDegrees = data.reduce((total, item) => total + parseInt(item.AWARDS), 0);
-            let nodes = [{
-                name: "Total ",
-                depth: 0,
-                parent_value: totalDegrees,
-                itemStyle: { color: "rgb(230, 230, 230)" },
-            }];
-            let links = [];
-            let prevGroup = [{ node: {}, link: {} }];
+            const groupCount = [0, 0, 0, 0, 0];
+            let mappedData = new Map();
             let depthOffset = 0;
 
-            for (let i = 1; i <= 5; i++) {
-                const currentGroup = [...new Set(data.map(item => item["GROUP" + i]))]
-                    .filter(item => item != "")
-                    .map((groupRow, j) => {
-                        const dataRows = data.filter(item => item["GROUP" + i] === groupRow);
-                        const dataDegrees = dataRows.reduce((total, item) => total + parseInt(item.AWARDS), 0);
-                        const dataParent = i > 1 ? dataRows.map(item => item["GROUP" + (i - 1)])[0] + (i - 1) : "Total ";
-                        const dataParentDegrees = i > 1 ? prevGroup.filter(prvItem => prvItem.link.target === dataParent)[0].link.value : totalDegrees;
-
-                        const node = {
-                            name: groupRow + i,
-                            depth: i,
-                            parent_value: dataParentDegrees,
-                            itemStyle: { color: "rgb(0, 0, 0)" },
-                            label: {
-                                formatter: (d) => {
-                                    return d.name.slice(0, -1).length > 16 ? d.name.slice(0, -1).slice(0, 16) + "..." : d.name.slice(0, -1);
+            data.forEach(item => {
+                for (let i = 1; i <= 5; i++) {
+                    const currentItemGroup = mappedData.get(item["GROUP" + i] + i);
+                    if (currentItemGroup == undefined && item["GROUP" + i] !== "") {
+                        mappedData.set(item["GROUP" + i] + i, {
+                            node: {
+                                name: item["GROUP" + i] + i,
+                                depth: i,
+                                degrees: { value: item.AWARDS },
+                                parent_value: i > 1 ? mappedData.get(item["GROUP" + (i - 1)] + (i - 1)).node.degrees : totalDegrees,
+                                itemStyle: i > 1 ? mappedData.get(item["GROUP" + (i - 1)] + (i - 1)).node.itemStyle : { color: "rgb(0, 0, 0)" },
+                                label: {
+                                    formatter: (d) => {
+                                        return d.name.slice(0, -1).length > 16 ? d.name.slice(0, -1).slice(0, 16) + "..." : d.name.slice(0, -1);
+                                    }
                                 }
+                            },
+                            link: {
+                                source: i > 1 ? item["GROUP" + (i - 1)] + (i - 1) : "Total ",
+                                target: item["GROUP" + i] + i,
+                                value: item.AWARDS,
+                                parent_value: i > 1 ? mappedData.get(item["GROUP" + (i - 1)]+ (i - 1)).node.degrees : totalDegrees
                             }
-                        };
-                        const link = {
-                            source: dataParent,
-                            target: groupRow + i,
-                            value: dataDegrees,
-                            parent_value: dataParentDegrees
-                        };
-
-                        return { node, link };
-                    });
-                currentGroup.sort((a, b) => {
-                    if (a.link.value < b.link.value) {
-                        return 1;
-                    } else if (a.link.value < b.link.value) {
-                        return -1;
-                    } else {
-                        return 0;
+                        });
+                        groupCount[i - 1]++;
                     }
-                });
-                currentGroup.forEach((item, k) => {
-                    item.node.itemStyle.color = i > 1 ? prevGroup.filter(prvItem => prvItem.link.target === item.link.source)[0].node.itemStyle.color : d3.rgb(d3.hsl(360 * (k / currentGroup.length), 1.0, 0.65)).toString();
-                    item.node.depth += depthOffset;
-
-                    if (k > nodeLimit * (depthOffset + 1)) {
-                        depthOffset++;
+                    else if (currentItemGroup != undefined) {
+                        currentItemGroup.node.degrees.value += item.AWARDS;
+                        currentItemGroup.link.value += item.AWARDS;
                     }
-
-                    nodes.push(item.node);
-                    links.push(item.link);
-                });
-
-                prevGroup = currentGroup;
+                }
+            });
+            const processedDataArr = [...mappedData.values()];
+            processedDataArr.sort((a, b) => {
+                return (b.link.value - a.link.value) - ((parseInt(b.node.name.slice(-1)) - parseInt(a.node.name.slice(-1))) * 10000);
+            });
+            processedDataArr
+                .filter(item => parseInt(item.node.name.slice(-1)) === 1)
+                .forEach((item, j, array) => item.node.itemStyle.color = d3.rgb(d3.hsl(360 * (j / array.length), 1.0, 0.65)).toString());
+            for (let k = 0; k < 5; k++) {
+                if (groupCount[k] > nodeLimit) {
+                    depthOffset++;
+                    processedDataArr
+                        .filter(item => parseInt(item.node.name.slice(-1)) === k + 1)
+                        .slice(nodeLimit)
+                        .forEach(item => { item.node.depth += depthOffset; });
+                }
+                else if (depthOffset > 0) {
+                    processedDataArr
+                        .filter(item => parseInt(item.node.name.slice(-1)) === k + 1)
+                        .forEach(item => { item.node.depth += depthOffset; });
+                }
             }
 
-            setNodes(nodes);
-            setLinks(links);
+            setNodes([{
+                    name: "Total ",
+                    depth: 0,
+                    parent_value: totalDegrees,
+                    itemStyle: { color: "rgb(230, 230, 230)" },
+                }].concat(processedDataArr.map(item => item.node)));
+            setLinks(processedDataArr.map(item => item.link));
         }
         sankeyDataProcess(data);
 
@@ -242,7 +242,6 @@ export default function Sankey({
 
     // Update sankey with new data
     useEffect(() => {
-        
         option.current.series.data = nodes;
         option.current.series.links = links;
         option.current.title.text = `${campus} Degrees Awarded Breakdown`;
