@@ -63,7 +63,7 @@ export default function InfoBox({
     return (
         <div className={`${className} relative`}>
             <div 
-                className={`border border-neutral-2 py-8 px-4 overflow-auto transition-all duration-300 ${showInfoCard ? 'blur-xs' : 'blur-none'}`}
+                className={`border border-neutral-2 py-8 px-8 overflow-auto transition-all duration-300 ${showInfoCard ? 'blur-xs' : 'blur-none'}`}
                 style={{ backgroundColor: color }}
             >
                 <h1 className="text-5xl font-semibold pb-2 text-neutral-1">
@@ -82,7 +82,7 @@ export default function InfoBox({
                 </h2>
                 <hr className="border-t border-neutral-1/30"></hr>
                 <div className="pt-3">
-                    <div className="bg-gray-50 rounded-lg container border-solid border-[2px] mx-auto px-4">
+                    <div className="bg-[#FAF9F6] rounded-lg container border-solid border-[2px] mx-auto px-4">
                         <span className="text-base text-left leading-relaxed">{infoText}</span>
                     </div>
                     <div
