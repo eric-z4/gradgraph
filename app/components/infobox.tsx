@@ -82,7 +82,9 @@ export default function InfoBox({
                 </h2>
                 <hr className="border-t border-neutral-1/30"></hr>
                 <div className="pt-3">
-                    <span className="text-base text-neutral-1 leading-relaxed">{infoText}</span>
+                    <div className="bg-gray-50 rounded-lg container border-solid border-[2px] mx-auto px-4 py-8">
+                        <span className="text-base leading-relaxed">{infoText}</span>
+                    </div>
                     <div
                         style={{
                             height: "250px",
