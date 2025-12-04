@@ -124,9 +124,15 @@ export default function ChartGroup({
     };
 
     return (
-        <div className="grid grid-cols-10 grid-row-1 h-screen px-4">
+        <div className="grid grid-cols-10 grid-row-1 min-h-screen px-4">
             <div className="bg-white col-span-3 flex justify-center">
-                <InfoBox data={filteredData} campus={campus} year={currentYear} color={getCampusColor(campus)} className="text-center flex h-screen w-93/100" />
+                <InfoBox 
+                    data={filteredData} 
+                    campus={campus} 
+                    year={currentYear} 
+                    color={getCampusColor(campus)} 
+                    className="text-center flex w-93/100" 
+                />
             </div>
             <div className="bg-white col-span-7 grid grid-cols-10 grid-rows-3">
                 <div className="grid grid-cols-9 row-start-1 col-span-10">

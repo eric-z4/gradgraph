@@ -61,9 +61,9 @@ export default function InfoBox({
     *     - Breakdown of major by gender?
     */
     return (
-        <div className={`${className} relative`}>
+        <div className={`${className} relative h-full min-h-screen`}>
             <div 
-                className={`border border-neutral-2 py-8 px-4 overflow-auto transition-all duration-300 ${showInfoCard ? 'blur-xs' : 'blur-none'}`}
+                className={`border border-neutral-2 py-8 px-4 overflow-auto h-full transition-all duration-300 ${showInfoCard ? 'blur-xs' : 'blur-none'}`}
                 style={{ backgroundColor: color }}
             >
                 <h1 className="text-5xl font-semibold pb-2 text-neutral-1">

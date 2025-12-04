@@ -153,7 +153,13 @@ export default function InfoBoxBarChart({ data, campus, year, className = "" }: 
                 .map(([name, value]) => ({ name, value }))
                 .sort((a, b) => b.value - a.value);
 
-            setXAxisData(sortData.map(item => item.name));
+            // setXAxisData(sortData.map(item => item.name));
+            // Customize xAxis labels by removing the word "degree" or "degrees"
+            setXAxisData(
+                sortData.map(item =>
+                    item.name.replace(/degrees?/i, "").trim()
+                )
+            );
             setYAxisData(sortData.map(item => item.value));
         }
         barChartDataProcess(data);
