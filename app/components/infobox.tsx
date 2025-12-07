@@ -52,14 +52,6 @@ export default function InfoBox({
     };
     const infoText = getInfoText(campus);
 
-    /*
-    * - Have text be changeable (Text as useState)
-    * - Display info of...
-    *     - Campus name
-    *     - Fiscal Year?
-    *     - Major percentage explanation?
-    *     - Breakdown of major by gender?
-    */
     return (
         <div className={`${className} relative`}>
             <div 
@@ -82,7 +74,7 @@ export default function InfoBox({
                 </h2>
                 <hr className="border-t border-neutral-1/30"></hr>
                 <div className="pt-3">
-                    <div className="bg-[#FAF9F6] rounded-lg container border-solid border-[2px] mx-auto px-4">
+                    <div className="bg-[#FAF9F6] rounded-lg container border-solid border-[2px] mx-auto px-4 pl-6">
                         <span className="text-base text-left leading-relaxed">{infoText}</span>
                     </div>
                     <div
