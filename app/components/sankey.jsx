@@ -183,21 +183,38 @@ export default function Sankey({
             }
         });
 
-        // // For selecting nodes like donut chart
+        // For selecting nodes like donut chart
+        // chart.on("click", (params) => {
+        //     if (params.dataType === "node" && params.data.depth === 1 && option.current) {
+        //         const nodeIndex = params.dataIndex - 1;
+        //         if (nodeIndex >= 0) {
+        //             // Get the node's name
+        //             const sliceName = option.current.series.data[params.dataIndex].name.slice(0, -1); // remove depth number
+
+        //             setSelectedSlice(prev =>
+        //                 prev?.name === sliceName
+        //                     ? null
+        //                     : { index: params.dataIndex, name: sliceName }
+        //             );
+
+        //             // Optional: zoomToNode(nodeIndex);
+        //         }
+        //     }
+        // });
+
         chart.on("click", (params) => {
-            if (params.dataType === "node" && params.data.depth === 1 && option.current) {
+            if (params.dataType === "node" && option.current) {
                 const nodeIndex = params.dataIndex - 1;
                 if (nodeIndex >= 0) {
-                    // Get the node's name
-                    const sliceName = option.current.series.data[params.dataIndex].name.slice(0, -1); // remove depth number
+                    const node = option.current.series.data[nodeIndex];
+                    const depth = node.depth; // 1-4
+                    const name = node.name.slice(0, -1); // remove trailing number
 
                     setSelectedSlice(prev =>
-                        prev?.name === sliceName
+                        prev?.name === name && prev?.depth === depth
                             ? null
-                            : { index: params.dataIndex, name: sliceName }
+                            : { index: nodeIndex, name, depth }
                     );
-
-                    // Optional: zoomToNode(nodeIndex);
                 }
             }
         });

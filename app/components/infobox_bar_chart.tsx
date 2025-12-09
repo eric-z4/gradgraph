@@ -142,14 +142,22 @@ export default function InfoBoxBarChart({ data, campus, year, className = "" }: 
     useEffect(() => {
         async function barChartDataProcess(data: DataColumns[]) {
 
-            // If a donut slice (college) is selected, filter by GROUP1
-            const filteredByCollege = selectedSlice
-                ? data.filter(row => row.GROUP1 === selectedSlice.name)
+            // If a donut slice (college) is selected, filter by GROUP1, GROUP2, etc.
+            // const filteredByCollege = selectedSlice
+            //     ? data.filter(row => row.GROUP1 === selectedSlice.name)
+            //     : data;
+            const filterByCollegeOrMajorData = selectedSlice
+                ? data.filter(row => {
+                    // Use GROUP4 if depth > 3
+                    const depthCol = Math.min(selectedSlice.depth, 3);
+                    const groupCol = `GROUP${depthCol}` as keyof DataColumns;
+                    return row[groupCol] === selectedSlice.name;
+                })
                 : data;
 
             const degreeTypeTotals = {} as Record<string, number>;
 
-            for (const row of filteredByCollege) {
+            for (const row of filterByCollegeOrMajorData) {
                 const degreeType = row.OUTCOME;
                 if (!degreeType) continue;
 

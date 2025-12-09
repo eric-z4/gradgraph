@@ -30,6 +30,7 @@ interface DonutProps {
 interface SelectedSlice {
   index: number;
   name: string;
+  depth: number;
 }
 
 // This is why I don't want to change my sankey.jsx to Typescript
@@ -190,7 +191,8 @@ export default function Donut({ data, campus, year, className="" }: DonutProps) 
         setSelectedSlice((prev: SelectedSlice | null) =>
           prev && prev.index === params.dataIndex ? null : {
             index: params.dataIndex,
-            name: sliceName
+            name: sliceName,
+            depth: 1,
           }
         );
       }
