@@ -143,16 +143,38 @@ export default function InfoBoxBarChart({ data, campus, year, className = "" }: 
         async function barChartDataProcess(data: DataColumns[]) {
 
             // If a donut slice (college) is selected, filter by GROUP1, GROUP2, etc.
-            // const filteredByCollege = selectedSlice
-            //     ? data.filter(row => row.GROUP1 === selectedSlice.name)
-            //     : data;
             const filterByCollegeOrMajorData = selectedSlice
-                ? data.filter(row => {
-                    // Use GROUP4 if depth > 3
-                    const depthCol = Math.min(selectedSlice.depth, 3);
-                    const groupCol = `GROUP${depthCol}` as keyof DataColumns;
-                    return row[groupCol] === selectedSlice.name;
-                })
+                ? (() => {
+                    const depth = selectedSlice.depth;
+
+                    // 1️⃣ Primary: use GROUP1–3 (capped)
+                    const primaryDepth = Math.min(depth, 3);
+                    const primaryGroup = `GROUP${primaryDepth}` as keyof DataColumns;
+
+                    let results = data.filter(row => row[primaryGroup] === selectedSlice.name);
+                    if (results.length > 0) return results;
+
+                    // 2️⃣ Fallback #1: GROUP4 (only if depth > 3)
+                    if (depth > 3) {
+                        const group4 = "GROUP4" as keyof DataColumns;
+                        results = data.filter(row => row[group4] === selectedSlice.name);
+                        if (results.length > 0) {
+                            return results;
+                        }
+                    }
+
+                    // 3️⃣ Fallback #2: GROUP5 (only if GROUP4 failed)
+                    if (depth > 3) {
+                        const group5 = "GROUP5" as keyof DataColumns;
+                        results = data.filter(row => row[group5] === selectedSlice.name);
+                        if (results.length > 0) {
+                            return results;
+                        }
+                    }
+
+                    // If nothing matched, return empty array instead of whole dataset.
+                    return [];
+                })()
                 : data;
 
             const degreeTypeTotals = {} as Record<string, number>;

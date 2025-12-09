@@ -124,7 +124,7 @@ export default function ChartGroup({
     };
 
     return (
-        <SankeyAndDonutSyncProvider>
+        <SankeyAndDonutSyncProvider campus={campus}>
             <div className="grid grid-cols-10 grid-row-1 min-h-screen px-4">
                 <div className="bg-white col-span-3 flex justify-center">
                     <InfoBox

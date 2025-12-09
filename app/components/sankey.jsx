@@ -184,38 +184,28 @@ export default function Sankey({
         });
 
         // For selecting nodes like donut chart
-        // chart.on("click", (params) => {
-        //     if (params.dataType === "node" && params.data.depth === 1 && option.current) {
-        //         const nodeIndex = params.dataIndex - 1;
-        //         if (nodeIndex >= 0) {
-        //             // Get the node's name
-        //             const sliceName = option.current.series.data[params.dataIndex].name.slice(0, -1); // remove depth number
-
-        //             setSelectedSlice(prev =>
-        //                 prev?.name === sliceName
-        //                     ? null
-        //                     : { index: params.dataIndex, name: sliceName }
-        //             );
-
-        //             // Optional: zoomToNode(nodeIndex);
-        //         }
-        //     }
-        // });
-
         chart.on("click", (params) => {
             if (params.dataType === "node" && option.current) {
-                const nodeIndex = params.dataIndex - 1;
-                if (nodeIndex >= 0) {
-                    const node = option.current.series.data[nodeIndex];
-                    const depth = node.depth; // 1-4
-                    const name = node.name.slice(0, -1); // remove trailing number
+                // ignore Total node
+                if (params.dataIndex === 0) return;
 
-                    setSelectedSlice(prev =>
-                        prev?.name === name && prev?.depth === depth
-                            ? null
-                            : { index: nodeIndex, name, depth }
-                    );
-                }
+                const nodeIndex = params.dataIndex; 
+                const node = option.current.series.data[nodeIndex]; 
+                const depth = node.depth;
+                const name = node.name.slice(0, -1); // remove trailing number
+                const totalDegrees = node.parent_value.value;      // top-level denom
+                const nodeValue = node.degrees.value;              // this node's value
+                const percentage = ((nodeValue / totalDegrees) * 100).toFixed(1);
+
+                setSelectedSlice(prev =>
+                    prev?.name === name && prev?.depth === depth
+                        ? null
+                        : { index: nodeIndex - 1, 
+                            name, 
+                            depth, 
+                            value: nodeValue,
+                            total: totalDegrees, percentage } // store index relative to your "real" nodes array
+                );
             }
         });
 

@@ -1,28 +1,3 @@
-function generateMDX(selectedSlice, barChartData, totalStudents) {
-  const percentOfStudents = ((selectedSlice.value / totalStudents) * 100).toFixed(1);
-  const sortedByCount = [...barChartData].sort((a, b) => b.value - a.value);
-  const topMajors = sortedByCount.slice(0, 3).map(d => d.name);
-  const mostCommonDegree = sortedByCount[0]?.name || "";
-  const degreeTypeRows = sortedByCount.map(item => `${item.name} : ${item.value} `).join("\n");
-
-  return `
----
-title: "Detailed Breakdown Summary"
----
-
 # Detailed Breakdown Summary
 
-${percentOfStudents}% of all students graduated in **${selectedSlice.name}**.
-
-## Students mainly received degrees in:
-1. ${topMajors[0] || "-"}
-2. ${topMajors[1] || "-"}
-3. ${topMajors[2] || "-"}
-
-## Degree types breakdown:
-
-Most people majored in **${mostCommonDegree}**.
-
-${degreeTypeRows}
-`;
-}
+This section displays information about the selected degree program.
