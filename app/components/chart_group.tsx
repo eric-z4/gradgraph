@@ -124,23 +124,31 @@ export default function ChartGroup({
     };
 
     return (
-        <div className="grid grid-cols-10 grid-row-1 h-screen px-4">
-            <div className="bg-white col-span-3 flex justify-center">
-                <InfoBox data={filteredData} campus={campus} year={currentYear} color={getCampusColor(campus)} className="text-center flex h-screen" />
-            </div>
-            <div className="bg-white col-span-7 grid grid-cols-10 grid-rows-3">
-                <div className="grid grid-cols-9 row-start-1 col-span-10">
-                    <div className="col-start-1 col-span-3">{renderChart(Campus.Manoa, "#024731")}</div>
-                    <div className="col-start-4 col-span-3">{renderChart(Campus.Hilo, "#A32015")}</div>
-                    <div className="col-start-7 col-span-3">{renderChart(Campus.WestOahu, "#A71930")}</div>
+        <SankeyAndDonutSyncProvider campus={campus}>
+            <div className="grid grid-cols-10 grid-row-1 min-h-screen px-4">
+                <div className="bg-white col-span-3 flex justify-center">
+                    <InfoBox
+                        data={filteredData}
+                        campus={campus}
+                        year={currentYear}
+                        color={getCampusColor(campus)}
+                        className="text-center flex w-93/100"
+                    />
                 </div>
-                <div className="row-start-2 row-span-2 col-span-10 grid grid-cols-subgrid">
-                    <SankeyAndDonutSyncProvider>
-                        <Donut data={filteredData} campus={campus} year={currentYear} className="col-start-1 col-span-5 bg-white border-2 border-neutral-2 rounded-[50px] p-2 m-4 flex items-center justify-center" />
-                        <Sankey data={filteredData} campus={campus} className="col-start-6 col-span-5 bg-white border-2 border-neutral-2 rounded-[50px] p-4 m-4" />
-                    </SankeyAndDonutSyncProvider>
+                <div className="bg-white col-span-7 grid grid-cols-10 grid-rows-3">
+                    <div className="grid grid-cols-9 row-start-1 col-span-10">
+                        <div className="col-start-1 col-span-3">{renderChart(Campus.Manoa, "#024731")}</div>
+                        <div className="col-start-4 col-span-3">{renderChart(Campus.Hilo, "#A32015")}</div>
+                        <div className="col-start-7 col-span-3">{renderChart(Campus.WestOahu, "#A71930")}</div>
+                    </div>
+                    <div className="row-start-2 row-span-2 col-span-10 grid grid-cols-subgrid">
+                        {/* <SankeyAndDonutSyncProvider> */}
+                            <Donut data={filteredData} campus={campus} year={currentYear} className="col-start-1 col-span-5 bg-white border-2 border-neutral-2 rounded-[50px] p-2 m-4 flex items-center justify-center" />
+                            <Sankey data={filteredData} campus={campus} className="col-start-6 col-span-5 bg-white border-2 border-neutral-2 rounded-[50px] p-4 m-4" />
+                        {/* </SankeyAndDonutSyncProvider> */}
+                    </div>
                 </div>
             </div>
-        </div>
+        </SankeyAndDonutSyncProvider>
     );
 }

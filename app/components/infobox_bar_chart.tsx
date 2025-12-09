@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import * as echarts from "echarts";
+import { useSankeyAndDonutSync } from "../SankeyAndDonutSync";
 
 interface DataColumns {
   FISCAL_YEAR: string;
@@ -75,6 +76,7 @@ export default function InfoBoxBarChart({ data, campus, year, className = "" }: 
     const yearNumber = year ? year.replace(/[^\d]/g, '') : '2025';
     const [xAxisData, setXAxisData] = useState<string[]>([]);
     const [yAxisData, setYAxisData] = useState<number[]>([]);
+    const { selectedSlice } = useSankeyAndDonutSync();
 
     useEffect(() => {
         if (chartRef.current) {
@@ -139,9 +141,45 @@ export default function InfoBoxBarChart({ data, campus, year, className = "" }: 
     // Asynchronously process the data when it changes
     useEffect(() => {
         async function barChartDataProcess(data: DataColumns[]) {
+
+            // If a donut slice (college) is selected, filter by GROUP1, GROUP2, etc.
+            const filterByCollegeOrMajorData = selectedSlice
+                ? (() => {
+                    const depth = selectedSlice.depth;
+
+                    // 1️⃣ Primary: use GROUP1–3 (capped)
+                    const primaryDepth = Math.min(depth, 3);
+                    const primaryGroup = `GROUP${primaryDepth}` as keyof DataColumns;
+
+                    let results = data.filter(row => row[primaryGroup] === selectedSlice.name);
+                    if (results.length > 0) return results;
+
+                    // 2️⃣ Fallback #1: GROUP4 (only if depth > 3)
+                    if (depth > 3) {
+                        const group4 = "GROUP4" as keyof DataColumns;
+                        results = data.filter(row => row[group4] === selectedSlice.name);
+                        if (results.length > 0) {
+                            return results;
+                        }
+                    }
+
+                    // 3️⃣ Fallback #2: GROUP5 (only if GROUP4 failed)
+                    if (depth > 3) {
+                        const group5 = "GROUP5" as keyof DataColumns;
+                        results = data.filter(row => row[group5] === selectedSlice.name);
+                        if (results.length > 0) {
+                            return results;
+                        }
+                    }
+
+                    // If nothing matched, return empty array instead of whole dataset.
+                    return [];
+                })()
+                : data;
+
             const degreeTypeTotals = {} as Record<string, number>;
 
-            for (const row of data) {
+            for (const row of filterByCollegeOrMajorData) {
                 const degreeType = row.OUTCOME;
                 if (!degreeType) continue;
 
@@ -153,26 +191,34 @@ export default function InfoBoxBarChart({ data, campus, year, className = "" }: 
                 .map(([name, value]) => ({ name, value }))
                 .sort((a, b) => b.value - a.value);
 
-            setXAxisData(sortData.map(item => item.name));
+            // setXAxisData(sortData.map(item => item.name));
+            // Customize xAxis labels by removing the word "degree" or "degrees"
+            setXAxisData(
+                sortData.map(item =>
+                    item.name.replace(/degrees?/i, "").trim()
+                )
+            );
             setYAxisData(sortData.map(item => item.value));
         }
         barChartDataProcess(data);
         
         return () => {};
-    }, [data])
+    }, [data, selectedSlice])
 
     useEffect(() => {
         if (!chartInstance.current) return;
 
         if (option.current != null) {
-            option.current.title.text = `${campus} Degrees Awarded`;
+            option.current.title.text = selectedSlice
+                ? `${selectedSlice.name}`
+                : `${campus} Degrees Awarded`;
             option.current.title.subtext = `Fiscal Year ${yearNumber}`;
             option.current.xAxis[0].data = xAxisData;
             option.current.series[0].data = yAxisData;
 
             chartInstance.current.setOption(option.current);
         }
-    }, [xAxisData, yAxisData, data, campus, year, yearNumber]);
+    }, [xAxisData, yAxisData, data, campus, year, yearNumber, selectedSlice]);
 
     return (
         <div
