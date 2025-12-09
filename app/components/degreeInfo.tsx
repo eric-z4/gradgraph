@@ -46,15 +46,8 @@ export function DegreeInfo({
         {percentOfStudents}% of all students graduated in the <strong>{selectedSlice.name}</strong>.
       </p>
 
-      {/* <h2 className="text-lg ">Students mainly received degrees in:</h2>
-      <ul className="ps-3 list-disc list-inside mb-4">
-        <li>{topMajors[0] || "-"} ({topMajorsCount[0]})</li>
-        <li>{topMajors[1] || "-"} ({topMajorsCount[1]})</li>
-        <li>{topMajors[2] || "-"} ({topMajorsCount[2]})</li>
-      </ul> */}
-
       {/* ONLY show this section when depth === 1 */}
-      {selectedSlice.depth === 1 && (
+      {selectedSlice.depth === 1 && topMajors.length > 2 && (
         <>
           <h2 className="text-lg ">Students mainly received degrees in:</h2>
           <ul className="ps-3 list-disc list-inside mb-4">

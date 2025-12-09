@@ -143,8 +143,8 @@ export default function ChartGroup({
                     </div>
                     <div className="row-start-2 row-span-2 col-span-10 grid grid-cols-subgrid">
                         {/* <SankeyAndDonutSyncProvider> */}
-                            <Donut data={filteredData} campus={campus} year={currentYear} className="col-start-1 col-span-5 bg-white border-2 border-neutral-2 rounded-[50px] p-2 m-4 flex items-center justify-center" />
-                            <Sankey data={filteredData} campus={campus} className="col-start-6 col-span-5 bg-white border-2 border-neutral-2 rounded-[50px] p-4 m-4" />
+                            <Donut style={{ height: "720px" }} data={filteredData} campus={campus} year={currentYear} className="col-start-1 col-span-5 bg-white border-2 border-neutral-2 rounded-[50px] p-2 m-4 flex items-center justify-center" />
+                            <Sankey style={{ height: "720px" }} data={filteredData} campus={campus} className="col-start-6 col-span-5 bg-white border-2 border-neutral-2 rounded-[50px] p-4 m-4" />
                         {/* </SankeyAndDonutSyncProvider> */}
                     </div>
                 </div>

@@ -24,6 +24,7 @@ interface DonutProps {
   campus: string;
   year: string;
   className?: string;
+  style?: React.CSSProperties;
 }
 
 // Define the type at the top of your file
@@ -93,7 +94,7 @@ interface CustomOptionProps extends echarts.EChartsCoreOption {
     }[];
 }
 
-export default function Donut({ data, campus, year, className="" }: DonutProps) {
+export default function Donut({ data, campus, year, className="", style = {} }: DonutProps) {
   const chartRef = useRef<HTMLDivElement | null>(null);
     const chartInstance = useRef<echarts.ECharts | null>(null);
     const option = useRef<CustomOptionProps | null>(null);
@@ -363,7 +364,7 @@ export default function Donut({ data, campus, year, className="" }: DonutProps) 
   }, [legendData, seriesData, campus, year, yearNumber]);
 
     return (
-        <div className={className}>
+        <div className={className} style={style}>
       <div
         ref={chartRef}
         style={{ width: "95%", height: "95%" }}
