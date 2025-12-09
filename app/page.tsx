@@ -20,11 +20,6 @@ export default async function Page() {
         };
     }));
 
-    /*
-    * TODO
-    * - Work on front-end visuals
-    */
-    
     return (
         <ChartGroup rawDegreeData={rawDegreeData} />
     );

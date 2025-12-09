@@ -17,7 +17,7 @@ export default function Sankey({
     const chartRef = useRef(null);
     const chartInstance = useRef(null);
     const option = useRef({});
-    const { hoveredCollege, setHoveredCollege } = useSankeyAndDonutSync();
+    const { hoveredCollege, setHoveredCollege, selectedSlice, setSelectedSlice } = useSankeyAndDonutSync();
     const [nodes, setNodes] = useState([]);
     const [links, setLinks] = useState([]);
 
@@ -124,6 +124,17 @@ export default function Sankey({
             }
         });
 
+        // For selecting nodes like donut chart
+        chart.on("click", (params) => {
+            if (params.dataType === "node" && params.data.depth === 1) {
+                const nodeIndex = params.dataIndex - 1; // offset for "Total" node
+                if (nodeIndex >= 0) {
+                    // Toggle selection like Donut
+                    setSelectedSlice(prev => prev === nodeIndex ? null : nodeIndex);
+                }
+            }
+        });
+
         chart.on("mouseout", () => {
             setHoveredCollege(null);
         });
@@ -139,26 +150,48 @@ export default function Sankey({
             chartInstance.current = null;
             window.removeEventListener("resize", handleResize);
         };
-    }, [setHoveredCollege]);
+    }, [setHoveredCollege, setSelectedSlice]);
 
     // Handle hover from donut chart
     useEffect(() => {
         if (!chartInstance.current) return;
-        
-        if (hoveredCollege != null) {
-            // Highlight the corresponding college node (add 1 for "Total" node offset)
+
+        // Always downplay everything first
+        chartInstance.current.dispatchAction({
+            type: "downplay",
+            seriesIndex: 0,
+        });
+
+        // Highlight selected node first
+        if (selectedSlice != null) {
+            chartInstance.current.dispatchAction({
+                type: "highlight",
+                seriesIndex: 0,
+                dataIndex: selectedSlice + 1,
+            });
+        }
+
+        // Highlight hovered node on top of selected
+        if (hoveredCollege != null && hoveredCollege !== selectedSlice) {
             chartInstance.current.dispatchAction({
                 type: "highlight",
                 seriesIndex: 0,
                 dataIndex: hoveredCollege + 1,
             });
-        } else {
-            chartInstance.current.dispatchAction({
-                type: "downplay",
-                seriesIndex: 0,
-            });
         }
-    }, [hoveredCollege]);
+
+        // Show tooltip for hovered slice, or selected if none hovered
+        const tooltipIndex = hoveredCollege ?? selectedSlice;
+        if (tooltipIndex != null) {
+            chartInstance.current.dispatchAction({
+                type: "showTip",
+                seriesIndex: 0,
+                dataIndex: tooltipIndex + 1,
+            });
+        } else {
+            chartInstance.current.dispatchAction({ type: "hideTip" });
+        }
+    }, [hoveredCollege, selectedSlice]);
 
     // Asynchronously process the data when it changes
     useEffect(() => {

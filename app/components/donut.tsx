@@ -93,7 +93,7 @@ export default function Donut({ data, campus, year, className="" }: DonutProps) 
     const yearNumber = year ? year.replace(/[^\d]/g, '') : '2025';
     const [legendData, setLegendData] = useState<string[]>([]);
     const [seriesData, setSeriesData] = useState<{ name: string, value: number, itemStyle: {color: string} }[]>([]);
-  const [selectedSlice, setSelectedSlice] = useState<number | null>(null);
+  const { selectedSlice, setSelectedSlice } = useSankeyAndDonutSync();
 
   useEffect(() => {
     if (!chartRef.current) return;
@@ -179,7 +179,7 @@ export default function Donut({ data, campus, year, className="" }: DonutProps) 
     // Instance for selecting slices
     chartInstance.current.on("click", params => {
       if (params.dataIndex != null) {
-        setSelectedSlice(prev => prev === params.dataIndex ? null : params.dataIndex);
+        setSelectedSlice((prev: number | null) => prev === params.dataIndex ? null : params.dataIndex);
       }
     });
 
@@ -187,7 +187,7 @@ export default function Donut({ data, campus, year, className="" }: DonutProps) 
       chartInstance.current?.dispose();
       chartInstance.current = null;
     };
-  }, [setHoveredCollege]);
+  }, [setHoveredCollege, setSelectedSlice]);
 
   // Highlight effect (hover + click)
   useEffect(() => {
