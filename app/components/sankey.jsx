@@ -15,6 +15,7 @@ export default function Sankey({
     data,
     campus,
     className = "",
+    style = {},
 }) {
     const chartRef = useRef(null);
     const chartInstance = useRef(null);
@@ -357,7 +358,7 @@ export default function Sankey({
         chartInstance.current.setOption(option.current);
     }, [nodes, links, campus]);
 
-    return <div ref={chartRef} className={className} onDoubleClick={() => {
+    return <div ref={chartRef} className={className} style={style} onDoubleClick={() => {
         // Reset zoom and center on double click
         chartInstance.current.setOption({ series: { type:"sankey", zoom: 1, center: ["50%", "50%"] } });
     }}></div >;

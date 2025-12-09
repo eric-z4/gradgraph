@@ -315,7 +315,7 @@ export default function InfoBox({
 
                     {/* MDX / Markdown content */}
                     <div className="bg-[#FAF9F6] rounded-lg container border-solid border-[2px] mx-auto px-4">
-                        <div className="text-base max-w-full text-left leading-relaxed">
+                        <div className="text-base max-w-full text-left leading-relaxed overflow-auto h-full">
                             {mdxContent}
                         </div>
                     </div>
