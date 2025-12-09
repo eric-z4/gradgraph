@@ -93,6 +93,7 @@ export default function Donut({ data, campus, year, className="" }: DonutProps) 
     const yearNumber = year ? year.replace(/[^\d]/g, '') : '2025';
     const [legendData, setLegendData] = useState<string[]>([]);
     const [seriesData, setSeriesData] = useState<{ name: string, value: number, itemStyle: {color: string} }[]>([]);
+  const [selectedSlice, setSelectedSlice] = useState<number | null>(null);
 
   useEffect(() => {
     if (!chartRef.current) return;
@@ -155,13 +156,18 @@ export default function Donut({ data, campus, year, className="" }: DonutProps) 
         ]
       }
 
+    // chartInstance.current.on("mouseover", params => {
+    //   if (params.dataIndex != null && chartInstance.current) {
+    //     // Downplay all slices first, then highlight the current one
+    //     chartInstance.current.dispatchAction({
+    //       type: "downplay",
+    //       seriesIndex: 0,
+    //     });
+    //     setHoveredCollege(params.dataIndex);
+    //   }
+    // });
     chartInstance.current.on("mouseover", params => {
-      if (params.dataIndex != null && chartInstance.current) {
-        // Downplay all slices first, then highlight the current one
-        chartInstance.current.dispatchAction({
-          type: "downplay",
-          seriesIndex: 0,
-        });
+      if (params.dataIndex != null) {
         setHoveredCollege(params.dataIndex);
       }
     });
@@ -170,31 +176,116 @@ export default function Donut({ data, campus, year, className="" }: DonutProps) 
       setHoveredCollege(null);
     });
 
+    // Instance for selecting slices
+    chartInstance.current.on("click", params => {
+      if (params.dataIndex != null) {
+        setSelectedSlice(prev => prev === params.dataIndex ? null : params.dataIndex);
+      }
+    });
+
     return () => {
       chartInstance.current?.dispose();
       chartInstance.current = null;
     };
   }, [setHoveredCollege]);
 
+  // Highlight effect (hover + click)
   useEffect(() => {
     if (!chartInstance.current) return;
 
-    if (hoveredCollege != null) {
-        chartInstance.current.dispatchAction({
+    // Downplay everything
+    chartInstance.current.dispatchAction({
+      type: "downplay",
+      seriesIndex: 0,
+    });
+
+    // Highlight selected slice first (if any)
+    if (selectedSlice != null) {
+      chartInstance.current.dispatchAction({
+        type: "highlight",
+        seriesIndex: 0,
+        dataIndex: selectedSlice,
+      });
+    }
+
+    // Highlight hovered slice on top of selected slice
+    if (hoveredCollege != null && hoveredCollege !== selectedSlice) {
+      chartInstance.current.dispatchAction({
         type: "highlight",
         seriesIndex: 0,
         dataIndex: hoveredCollege,
       });
+    }
+
+    // Show tooltip for hovered slice, or selected if none hovered
+    const tooltipIndex = hoveredCollege ?? selectedSlice;
+    if (tooltipIndex != null) {
       chartInstance.current.dispatchAction({
         type: "showTip",
         seriesIndex: 0,
-        dataIndex: hoveredCollege,
+        dataIndex: tooltipIndex,
       });
     } else {
-      chartInstance.current.dispatchAction({ type: "downplay", seriesIndex: 0 });
       chartInstance.current.dispatchAction({ type: "hideTip" });
     }
-  }, [hoveredCollege]);
+  }, [hoveredCollege, selectedSlice]);
+
+
+
+
+  // useEffect(() => {
+  //   if (!chartInstance.current) return;
+
+  //   // Downplay all slices first
+  //   chartInstance.current.dispatchAction({
+  //     type: "downplay",
+  //     seriesIndex: 0,
+  //   });
+
+  //   if (selectedSlice != null) {
+  //     chartInstance.current.dispatchAction({
+  //       type: "highlight",
+  //       seriesIndex: 0,
+  //       dataIndex: selectedSlice,
+  //     });
+  //     chartInstance.current.dispatchAction({
+  //       type: "showTip",
+  //       seriesIndex: 0,
+  //       dataIndex: selectedSlice,
+  //     });
+  //   } else if (hoveredCollege != null) {
+  //     chartInstance.current.dispatchAction({
+  //       type: "highlight",
+  //       seriesIndex: 0,
+  //       dataIndex: hoveredCollege,
+  //     });
+  //     chartInstance.current.dispatchAction({
+  //       type: "showTip",
+  //       seriesIndex: 0,
+  //       dataIndex: hoveredCollege,
+  //     });
+  //   } else {
+  //     chartInstance.current.dispatchAction({ type: "hideTip" });
+  //   }
+  // }, [hoveredCollege]);
+  //   if (hoveredCollege != null) {
+  //       chartInstance.current.dispatchAction({
+  //       type: "highlight",
+  //       seriesIndex: 0,
+  //       dataIndex: hoveredCollege,
+  //     });
+  //     chartInstance.current.dispatchAction({
+  //       type: "showTip",
+  //       seriesIndex: 0,
+  //       dataIndex: hoveredCollege,
+  //     });
+  //   } else {
+  //     chartInstance.current.dispatchAction({ type: "downplay", seriesIndex: 0 });
+  //     chartInstance.current.dispatchAction({ type: "hideTip" });
+  //   }
+  // }, [hoveredCollege]);
+
+
 
     // Asynchronously process the data when it changes
     useEffect(() => {

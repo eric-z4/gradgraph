@@ -131,7 +131,7 @@ export default function ChartGroup({
                     campus={campus} 
                     year={currentYear} 
                     color={getCampusColor(campus)} 
-                    className="text-center flex h-screen" 
+                    className="text-center flex w-93/100" 
                 />
             </div>
             <div className="bg-white col-span-7 grid grid-cols-10 grid-rows-3">
