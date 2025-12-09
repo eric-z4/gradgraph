@@ -2,13 +2,15 @@
 
 import * as d3 from "d3";
 import { init } from "echarts";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useSankeyAndDonutSync } from "../SankeyAndDonutSync";
 
 /*
 Some code for intiallizing echart copied from tania.dev
 https://www.taniarascia.com/apache-echarts-react/
 */
+
+
 export default function Sankey({
     data,
     campus,
@@ -20,6 +22,68 @@ export default function Sankey({
     const { hoveredCollege, setHoveredCollege, selectedSlice, setSelectedSlice } = useSankeyAndDonutSync();
     const [nodes, setNodes] = useState([]);
     const [links, setLinks] = useState([]);
+
+    
+    // Zoom and center Sankey on a specific node
+// const zoomToNode = useCallback((nodeIndex, zoomFactor = 2) => {
+//     if (!chartInstance.current || !nodes[nodeIndex + 1]) return;
+
+//     const seriesModel = chartInstance.current.getModel().getSeries()[0];
+//     const layout = seriesModel.getData().getItemLayout(nodeIndex + 1);
+
+//     if (!layout) return;
+
+//     const chartDom = chartRef.current;
+//     const chartWidth = chartDom.offsetWidth;
+//     const chartHeight = chartDom.offsetHeight;
+
+//     const nodeCenterX = layout.x + layout.width / 2;
+//     const nodeCenterY = layout.y + layout.height / 2;
+
+//     const centerXPercent = (nodeCenterX / chartWidth) * 100;
+//     const centerYPercent = (nodeCenterY / chartHeight) * 100;
+
+//     chartInstance.current.setOption({
+//         series: [{
+//             type: "sankey",
+//             center: [`${centerXPercent}%`, `${centerYPercent}%`],
+//             zoom: zoomFactor
+//         }]
+//     });
+// }, [chartInstance, nodes, chartRef]);
+
+// const zoomToNode = useCallback((nodeIndex, zoomFactor = 1.8) => {
+//     if (!chartInstance.current || !nodes[nodeIndex + 1]) return;
+
+//     const seriesModel = chartInstance.current.getModel().getSeries()[0];
+//     const layout = seriesModel.getData().getItemLayout(nodeIndex + 1);
+
+//     if (!layout) return;
+
+//     const chartDom = chartRef.current;
+//     const chartWidth = chartDom.offsetWidth;
+//     const chartHeight = chartDom.offsetHeight;
+
+//     const nodeCenterX = layout.x + layout.width / 2;
+//     const nodeCenterY = layout.y + layout.height / 2;
+
+//     const targetCenterX = chartWidth / 2;
+//     const targetCenterY = chartHeight / 2;
+
+//     const translateX = targetCenterX - nodeCenterX;
+//     const translateY = targetCenterY - nodeCenterY;
+
+//     chartInstance.current.setOption({
+//         series: [{
+//             type: "sankey",
+//             zoom: zoomFactor,
+//             center: [
+//                 `${50 + (translateX / chartWidth) * 100}%`,
+//                 `${50 + (translateY / chartHeight) * 100}%`
+//             ]
+//         }]
+//     }, { replaceMerge: ['series'] });
+// }, [nodes]);
 
     // Echart initialization
     useEffect(() => {
@@ -114,23 +178,26 @@ export default function Sankey({
                 // Only sync for GROUP1 nodes (colleges)
                 const nodeIndex = params.dataIndex - 1; // Subtract 1 for "Total" node
                 if (nodeIndex >= 0) {
-                    // Downplay all nodes first, then highlight will happen via sync
-                    chart.dispatchAction({
-                        type: "downplay",
-                        seriesIndex: 0,
-                    });
                     setHoveredCollege(nodeIndex);
                 }
             }
         });
 
-        // For selecting nodes like donut chart
+        // // For selecting nodes like donut chart
         chart.on("click", (params) => {
-            if (params.dataType === "node" && params.data.depth === 1) {
-                const nodeIndex = params.dataIndex - 1; // offset for "Total" node
+            if (params.dataType === "node" && params.data.depth === 1 && option.current) {
+                const nodeIndex = params.dataIndex - 1;
                 if (nodeIndex >= 0) {
-                    // Toggle selection like Donut
-                    setSelectedSlice(prev => prev === nodeIndex ? null : nodeIndex);
+                    // Get the node's name
+                    const sliceName = option.current.series.data[params.dataIndex].name.slice(0, -1); // remove depth number
+
+                    setSelectedSlice(prev =>
+                        prev?.name === sliceName
+                            ? null
+                            : { index: params.dataIndex, name: sliceName }
+                    );
+
+                    // Optional: zoomToNode(nodeIndex);
                 }
             }
         });
@@ -156,42 +223,43 @@ export default function Sankey({
     useEffect(() => {
         if (!chartInstance.current) return;
 
-        // Always downplay everything first
+        // Downplay all nodes first
         chartInstance.current.dispatchAction({
             type: "downplay",
             seriesIndex: 0,
         });
 
-        // Highlight selected node first
-        if (selectedSlice != null) {
-            chartInstance.current.dispatchAction({
-                type: "highlight",
-                seriesIndex: 0,
-                dataIndex: selectedSlice + 1,
-            });
-        }
-
-        // Highlight hovered node on top of selected
-        if (hoveredCollege != null && hoveredCollege !== selectedSlice) {
+        // If hovering, highlight hovered node (temporary)
+        if (hoveredCollege != null) {
             chartInstance.current.dispatchAction({
                 type: "highlight",
                 seriesIndex: 0,
                 dataIndex: hoveredCollege + 1,
             });
-        }
-
-        // Show tooltip for hovered slice, or selected if none hovered
-        const tooltipIndex = hoveredCollege ?? selectedSlice;
-        if (tooltipIndex != null) {
             chartInstance.current.dispatchAction({
                 type: "showTip",
                 seriesIndex: 0,
-                dataIndex: tooltipIndex + 1,
+                dataIndex: hoveredCollege + 1,
             });
-        } else {
+        } 
+        // If not hovering but have selection, highlight selected node
+        else if (selectedSlice != null) {
+            chartInstance.current.dispatchAction({
+                type: "highlight",
+                seriesIndex: 0,
+                dataIndex: selectedSlice.index + 1,
+            });
+            chartInstance.current.dispatchAction({
+                type: "showTip",
+                seriesIndex: 0,
+                dataIndex: selectedSlice.index + 1,
+            });
+        } 
+        // No hover and no selection, hide tooltip
+        else {
             chartInstance.current.dispatchAction({ type: "hideTip" });
         }
-    }, [hoveredCollege, selectedSlice]);
+    }, [hoveredCollege, selectedSlice, nodes]);
 
     // Asynchronously process the data when it changes
     useEffect(() => {

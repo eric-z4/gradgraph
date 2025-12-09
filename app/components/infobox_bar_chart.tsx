@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import * as echarts from "echarts";
+import { useSankeyAndDonutSync } from "../SankeyAndDonutSync";
 
 interface DataColumns {
   FISCAL_YEAR: string;
@@ -75,6 +76,7 @@ export default function InfoBoxBarChart({ data, campus, year, className = "" }: 
     const yearNumber = year ? year.replace(/[^\d]/g, '') : '2025';
     const [xAxisData, setXAxisData] = useState<string[]>([]);
     const [yAxisData, setYAxisData] = useState<number[]>([]);
+    const { selectedSlice } = useSankeyAndDonutSync();
 
     useEffect(() => {
         if (chartRef.current) {
@@ -139,9 +141,15 @@ export default function InfoBoxBarChart({ data, campus, year, className = "" }: 
     // Asynchronously process the data when it changes
     useEffect(() => {
         async function barChartDataProcess(data: DataColumns[]) {
+
+            // If a donut slice (college) is selected, filter by GROUP1
+            const filteredByCollege = selectedSlice
+                ? data.filter(row => row.GROUP1 === selectedSlice.name)
+                : data;
+
             const degreeTypeTotals = {} as Record<string, number>;
 
-            for (const row of data) {
+            for (const row of filteredByCollege) {
                 const degreeType = row.OUTCOME;
                 if (!degreeType) continue;
 
@@ -165,20 +173,22 @@ export default function InfoBoxBarChart({ data, campus, year, className = "" }: 
         barChartDataProcess(data);
         
         return () => {};
-    }, [data])
+    }, [data, selectedSlice])
 
     useEffect(() => {
         if (!chartInstance.current) return;
 
         if (option.current != null) {
-            option.current.title.text = `${campus} Degrees Awarded`;
+            option.current.title.text = selectedSlice
+                ? `${selectedSlice.name}`
+                : `${campus} Degrees Awarded`;
             option.current.title.subtext = `Fiscal Year ${yearNumber}`;
             option.current.xAxis[0].data = xAxisData;
             option.current.series[0].data = yAxisData;
 
             chartInstance.current.setOption(option.current);
         }
-    }, [xAxisData, yAxisData, data, campus, year, yearNumber]);
+    }, [xAxisData, yAxisData, data, campus, year, yearNumber, selectedSlice]);
 
     return (
         <div

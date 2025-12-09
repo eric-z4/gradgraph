@@ -26,6 +26,12 @@ interface DonutProps {
   className?: string;
 }
 
+// Define the type at the top of your file
+interface SelectedSlice {
+  index: number;
+  name: string;
+}
+
 // This is why I don't want to change my sankey.jsx to Typescript
 interface CustomOptionProps extends echarts.EChartsCoreOption {
     title: {
@@ -177,9 +183,16 @@ export default function Donut({ data, campus, year, className="" }: DonutProps) 
     });
 
     // Instance for selecting slices
-    chartInstance.current.on("click", params => {
-      if (params.dataIndex != null) {
-        setSelectedSlice((prev: number | null) => prev === params.dataIndex ? null : params.dataIndex);
+   chartInstance.current.on("click", params => {
+      if (params.dataIndex != null && option.current) {
+        const sliceName = option.current.series[0].data[params.dataIndex].name;
+
+        setSelectedSlice((prev: SelectedSlice | null) =>
+          prev && prev.index === params.dataIndex ? null : {
+            index: params.dataIndex,
+            name: sliceName
+          }
+        );
       }
     });
 
@@ -204,7 +217,7 @@ export default function Donut({ data, campus, year, className="" }: DonutProps) 
       chartInstance.current.dispatchAction({
         type: "highlight",
         seriesIndex: 0,
-        dataIndex: selectedSlice,
+        dataIndex: selectedSlice.index,
       });
     }
 
